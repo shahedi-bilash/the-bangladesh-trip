@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Plan your Bangladesh trip — free cost & itinerary estimator</title>
+  <meta name="description" content="Answer a few questions and get an instant, honest cost estimate, a day-by-day skeleton and a visa summary for your Bangladesh trip. Free and shareable.">
+  <link rel="canonical" href="https://the-bangladesh-trip.pages.dev/plan">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Plan your Bangladesh trip">
+  <meta property="og:description" content="An instant, honest cost estimate and day-by-day skeleton for your Bangladesh trip.">
+  <meta property="og:url" content="https://the-bangladesh-trip.pages.dev/plan">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="index.html"><span class="dot"></span> The Bangladesh Trip</a>
+      <button class="nav-toggle" aria-expanded="false" aria-controls="nav" aria-label="Menu">☰</button>
+      <nav class="nav" id="nav">
+        <a href="regions/dhaka-gateway.html">Regions</a>
+        <a href="cost-of-traveling-in-bangladesh.html">Costs</a>
+        <a href="visa.html">Visa</a>
+        <a href="about.html">About</a>
+        <a class="nav-cta" href="plan.html">Plan my trip</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="section">
+    <div class="wrap">
+
+      <!-- The form (hidden once a full plan is in the URL) -->
+      <div class="planner-form-wrap">
+        <p class="eyebrow center">Trip planner</p>
+        <h1 class="center" style="margin-bottom:.4rem">Let's shape your trip.</h1>
+        <p class="lead center" style="margin:0 auto 2rem">A few taps and you'll have a cost range, a day-by-day skeleton and your visa route.</p>
+
+        <form class="planner-form" id="planner-form">
+          <p class="form-warn" id="form-warn" tabindex="-1" hidden>Please choose at least one region to plan around.</p>
+
+          <!-- Regions -->
+          <div class="field">
+            <span class="field-label" id="lbl-regions">Where would you go?</span>
+            <p class="field-help">Pick one or more. The planner sizes your days across whatever you choose.</p>
+            <div class="choice-grid" role="group" aria-labelledby="lbl-regions">
+              <div class="choice">
+                <input type="checkbox" name="regions" id="r-dhaka" value="dhaka">
+                <label for="r-dhaka"><span class="c-title">Dhaka Gateway</span><span class="c-sub">The capital · 2+ days</span></label>
+              </div>
+              <div class="choice">
+                <input type="checkbox" name="regions" id="r-sundarbans" value="sundarbans">
+                <label for="r-sundarbans"><span class="c-title">Sundarbans</span><span class="c-sub">Mangrove cruise · 3+ days</span></label>
+              </div>
+              <div class="choice">
+                <input type="checkbox" name="regions" id="r-coxsbazar" value="coxsbazar">
+                <label for="r-coxsbazar"><span class="c-title">Cox's Bazar & Saint Martin</span><span class="c-sub">Coast & island · 3+ days</span></label>
+              </div>
+              <div class="choice">
+                <input type="checkbox" name="regions" id="r-sylhet" value="sylhet">
+                <label for="r-sylhet"><span class="c-title">Sylhet & Srimangal</span><span class="c-sub">Tea hills · 2+ days</span></label>
+              </div>
+              <div class="choice">
+                <input type="checkbox" name="regions" id="r-hilltracts" value="hilltracts">
+                <label for="r-hilltracts"><span class="c-title">Chittagong Hill Tracts</span><span class="c-sub">Mountains · 3+ days</span></label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Days -->
+          <div class="field">
+            <label class="field-label" for="f-days">How many days?</label>
+            <p class="field-help">Total days on the ground in Bangladesh.</p>
+            <div class="range-row">
+              <input type="range" id="f-days" name="days" min="2" max="30" step="1" value="7">
+              <span class="range-out" id="f-days-out">7 days</span>
+            </div>
+          </div>
+
+          <!-- Style -->
+          <div class="field">
+            <span class="field-label" id="lbl-style">Your travel style</span>
+            <p class="field-help">This sets the price band for hotels, transport and food.</p>
+            <div class="choice-grid" role="radiogroup" aria-labelledby="lbl-style">
+              <div class="choice">
+                <input type="radio" name="style" id="s-backpacker" value="backpacker">
+                <label for="s-backpacker"><span class="c-title">Backpacker</span><span class="c-sub">Guesthouses, buses, street food</span></label>
+              </div>
+              <div class="choice">
+                <input type="radio" name="style" id="s-comfort" value="comfort" checked>
+                <label for="s-comfort"><span class="c-title">Comfort</span><span class="c-sub">Solid hotels, mix of transport</span></label>
+              </div>
+              <div class="choice">
+                <input type="radio" name="style" id="s-premium" value="premium">
+                <label for="s-premium"><span class="c-title">Premium</span><span class="c-sub">Best rooms, flights, private guides</span></label>
+              </div>
+            </div>
+          </div>
+
+          <!-- From + Month -->
+          <div class="field">
+            <div class="two-col">
+              <div>
+                <label class="field-label" for="f-from">Where are you flying from?</label>
+                <p class="field-help">For your visa route & currency.</p>
+                <input class="input" list="country-list" id="f-from" name="from" placeholder="e.g. United Kingdom" autocomplete="country-name">
+                <datalist id="country-list">
+                  <option>United States</option><option>United Kingdom</option><option>Canada</option>
+                  <option>Australia</option><option>Germany</option><option>France</option>
+                  <option>Italy</option><option>Spain</option><option>Netherlands</option>
+                  <option>Japan</option><option>South Korea</option><option>Singapore</option>
+                  <option>India</option><option>China</option><option>United Arab Emirates</option>
+                  <option>Saudi Arabia</option><option>Thailand</option><option>Malaysia</option>
+                </datalist>
+              </div>
+              <div>
+                <label class="field-label" for="f-month">Roughly when? <span style="font-weight:400;color:var(--ink-70)">(optional)</span></label>
+                <p class="field-help">Helps flag the best season.</p>
+                <select class="select" id="f-month" name="month">
+                  <option value="">Not sure yet</option>
+                  <option>Jan</option><option>Feb</option><option>Mar</option><option>Apr</option>
+                  <option>May</option><option>Jun</option><option>Jul</option><option>Aug</option>
+                  <option>Sep</option><option>Oct</option><option>Nov</option><option>Dec</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-submit">
+            <button class="cta cta-lg" type="submit">Build my plan →</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- The result (populated by planner.js) -->
+      <div id="plan-result" class="article" hidden></div>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">The Bangladesh Trip<span class="dot"></span></div>
+          <p class="footer-about">An independent, personal trip-planning tool for people travelling to Bangladesh. Not affiliated with any government body or tourism board.</p>
+        </div>
+        <div>
+          <h4>Plan</h4>
+          <a href="plan.html">Trip planner</a>
+          <a href="cost-of-traveling-in-bangladesh.html">Costs</a>
+          <a href="visa.html">Visa summary</a>
+        </div>
+        <div>
+          <h4>Explore</h4>
+          <a href="regions/dhaka-gateway.html">Regions</a>
+          <a href="about.html">About</a>
+          <a href="credits.html">Image & data credits</a>
+        </div>
+      </div>
+      <p class="footer-disclosure">Some links on this site are affiliate links. We may earn a commission from bookings made through them, at no extra cost to you. Cost estimates are indicative and visa rules must always be verified with an official source.</p>
+      <div class="footer-bottom">
+        <span>© <span id="year"></span> The Bangladesh Trip. An independent project.</span>
+        <span>Made for travellers, not for a board.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/planner.js"></script>
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+    (function () {
+      var t = document.querySelector(".nav-toggle"), n = document.getElementById("nav");
+      if (t && n) t.addEventListener("click", function () {
+        var open = n.classList.toggle("open");
+        t.setAttribute("aria-expanded", open ? "true" : "false");
+      });
+    })();
+  </script>
+</body>
+</html>

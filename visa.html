@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bangladesh visa summary by nationality — check your route</title>
+  <meta name="description" content="A plain-language summary of Bangladesh visa routes by nationality: visa on arrival, e-visa or apply in advance. Always verify with an official Bangladesh mission.">
+  <link rel="canonical" href="https://the-bangladesh-trip.pages.dev/visa">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Bangladesh visa summary by nationality">
+  <meta property="og:description" content="Which visa route applies to you for Bangladesh — with a reminder to verify officially.">
+  <meta property="og:url" content="https://the-bangladesh-trip.pages.dev/visa">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="index.html"><span class="dot"></span> The Bangladesh Trip</a>
+      <button class="nav-toggle" aria-expanded="false" aria-controls="nav" aria-label="Menu">☰</button>
+      <nav class="nav" id="nav">
+        <a href="regions/dhaka-gateway.html">Regions</a>
+        <a href="cost-of-traveling-in-bangladesh.html">Costs</a>
+        <a href="visa.html">Visa</a>
+        <a href="about.html">About</a>
+        <a class="nav-cta" href="plan.html">Plan my trip</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="section">
+    <div class="wrap article">
+      <p class="breadcrumb"><a href="index.html">Home</a> / Visa</p>
+      <p class="eyebrow">Visa</p>
+      <h1>What's your visa route to Bangladesh?</h1>
+      <p class="lead">Type your country and we'll show the general route — visa on arrival, e-visa, or apply in advance. This is a starting point, not the final word.</p>
+
+      <div class="callout" style="border-left-color:#c0392b;background:#fbf3e8">
+        <p style="margin:0"><strong>⚠ Always verify officially.</strong> Visa rules for Bangladesh change, and eligibility depends on your exact passport, purpose and current policy. Before you book flights, confirm with an official Bangladesh embassy, high commission, consulate, or the government e-visa portal. Nothing on this page is legal or immigration advice.</p>
+      </div>
+
+      <div class="card" style="margin:2rem 0">
+        <label class="field-label" for="v-country">Your nationality / passport</label>
+        <input class="input" list="v-list" id="v-country" placeholder="e.g. Canada" style="margin-top:.5rem">
+        <datalist id="v-list"></datalist>
+        <div id="v-result" style="margin-top:1.2rem"></div>
+      </div>
+
+      <h2>The general picture</h2>
+      <p>Broadly, travellers fall into a few groups. Find yours below — but treat it only as a prompt to check the official position for your passport.</p>
+      <div id="v-groups"></div>
+
+      <div class="prefill-band">
+        <div>
+          <p style="font-weight:600;margin-bottom:.2rem">Know your route? Price the trip.</p>
+          <p class="muted" style="margin:0">Your visa summary shows up inside every plan too.</p>
+        </div>
+        <a class="cta" href="plan.html">Open the planner →</a>
+      </div>
+
+      <h2>Common questions</h2>
+      <div class="faq">
+        <details><summary>Is "visa on arrival" guaranteed if I'm eligible?</summary><p>No. Even where visa on arrival exists for your nationality, it's granted at the discretion of immigration officers and usually needs supporting documents — onward travel, a hotel booking, and proof of funds. Have them ready, and have a backup plan.</p></details>
+        <details><summary>How long can I stay as a tourist?</summary><p>Tourist stays are typically granted for a limited number of days and can vary by visa type and nationality. Check the exact duration on your visa or with the issuing mission.</p></details>
+        <details><summary>Do I need proof of onward travel?</summary><p>Very often, yes. Immigration and airlines may ask to see a departing ticket. It's wise to have one regardless of your visa route.</p></details>
+        <details><summary>Where is the official e-visa portal?</summary><p>Use only the official government portal or an accredited Bangladesh mission. We deliberately don't link a "portal" here because unofficial look-alike sites exist — search for the current official source or ask your nearest Bangladesh mission.</p></details>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">The Bangladesh Trip<span class="dot"></span></div>
+          <p class="footer-about">An independent, personal trip-planning tool for people travelling to Bangladesh. Not affiliated with any government body or tourism board.</p>
+        </div>
+        <div><h4>Plan</h4><a href="plan.html">Trip planner</a><a href="cost-of-traveling-in-bangladesh.html">Costs</a><a href="visa.html">Visa summary</a></div>
+        <div><h4>Explore</h4><a href="regions/dhaka-gateway.html">Regions</a><a href="about.html">About</a><a href="credits.html">Image & data credits</a></div>
+      </div>
+      <p class="footer-disclosure">Some links on this site are affiliate links. We may earn a commission from bookings made through them, at no extra cost to you. Cost estimates are indicative and visa rules must always be verified with an official source.</p>
+      <div class="footer-bottom"><span>© <span id="year"></span> The Bangladesh Trip. An independent project.</span><span>Made for travellers, not for a board.</span></div>
+    </div>
+  </footer>
+
+  <script src="assets/js/data.js"></script>
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+    (function(){var t=document.querySelector(".nav-toggle"),n=document.getElementById("nav");if(t&&n)t.addEventListener("click",function(){var o=n.classList.toggle("open");t.setAttribute("aria-expanded",o?"true":"false");});})();
+
+    // Build datalist + groups from VISA data
+    (function () {
+      var labels = { visa_on_arrival: "Visa on arrival (conditions apply)", e_visa: "e-Visa — apply online in advance", embassy: "Apply in advance (e-visa / embassy)" };
+      var all = [];
+      var groupsEl = document.getElementById("v-groups");
+      VISA.forEach(function (g) {
+        var wrap = document.createElement("div");
+        wrap.className = "card"; wrap.style.margin = "1rem 0";
+        var badge = document.createElement("span");
+        badge.className = "visa-badge visa-" + g.summary;
+        badge.textContent = labels[g.summary] || g.group;
+        wrap.appendChild(badge);
+        var note = document.createElement("p"); note.className = "muted"; note.textContent = g.note; wrap.appendChild(note);
+        var chips = document.createElement("div"); chips.className = "chips";
+        g.countries.slice().sort().forEach(function (c) {
+          all.push(c);
+          var chip = document.createElement("span"); chip.className = "chip"; chip.textContent = c; chips.appendChild(chip);
+        });
+        wrap.appendChild(chips);
+        groupsEl.appendChild(wrap);
+      });
+      // datalist
+      var dl = document.getElementById("v-list");
+      all.sort().forEach(function (c) { var o = document.createElement("option"); o.value = c; dl.appendChild(o); });
+
+      // lookup
+      var input = document.getElementById("v-country");
+      var out = document.getElementById("v-result");
+      function lookup() {
+        var lc = (input.value || "").trim().toLowerCase();
+        if (!lc) { out.innerHTML = ""; return; }
+        var found = null;
+        VISA.forEach(function (g) { g.countries.forEach(function (c) { if (c.toLowerCase() === lc) found = g; }); });
+        out.innerHTML = "";
+        if (found) {
+          var b = document.createElement("span"); b.className = "visa-badge visa-" + found.summary; b.textContent = labels[found.summary]; out.appendChild(b);
+          var p = document.createElement("p"); p.className = "muted"; p.style.margin = ".5rem 0 0"; p.textContent = found.note; out.appendChild(p);
+        } else {
+          var p2 = document.createElement("p"); p2.className = "muted"; p2.style.margin = "0";
+          p2.textContent = "We don't have a rule on file for that country. Confirm your route directly with an official Bangladesh mission or the government e-visa portal.";
+          out.appendChild(p2);
+        }
+        var warn = document.createElement("p"); warn.className = "verify-note"; warn.style.marginTop = ".7rem";
+        warn.textContent = "⚠ Verify with an official Bangladesh mission before booking. Rules change.";
+        out.appendChild(warn);
+      }
+      input.addEventListener("input", lookup);
+      input.addEventListener("change", lookup);
+    })();
+  </script>
+</body>
+</html>
