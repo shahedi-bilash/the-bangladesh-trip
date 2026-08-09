@@ -49,7 +49,9 @@
 
   <main id="main">
     <!-- Hero -->
-    <section class="hero">
+    <section class="hero hero--home">
+      <img class="hero-bg" src="/assets/img/hero.webp" alt="" width="1600" height="900" loading="eager" decoding="async" onerror="this.remove()">
+      <div class="hero-overlay" aria-hidden="true"></div>
       <div class="wrap">
         <p class="eyebrow">A traveller's planning tool · not an agency</p>
         <h1>Work out your Bangladesh trip in a few taps.</h1>
@@ -91,6 +93,54 @@
 
     <div class="divider"><span></span></div>
 
+    <!-- Interactive map -->
+    <section class="section map-section">
+      <div class="wrap">
+        <div class="map-layout">
+          <div class="map-figure">
+            <svg class="bd-map" viewBox="0 0 400 480" role="img" aria-label="Stylized map of Bangladesh showing five travel regions">
+              <path class="bd-outline" d="M150,60 C120,70 100,95 105,120 C90,140 95,165 110,175 C95,195 100,225 120,240 C110,270 120,300 140,320 C150,345 140,375 165,395 C185,410 210,405 220,385 C235,395 250,420 275,435 C300,445 320,440 315,415 C325,395 315,360 305,345 C320,320 320,290 305,275 C325,250 330,215 315,195 C330,175 335,150 320,135 C300,120 285,130 280,145 C265,120 255,95 230,85 C205,70 175,55 150,60 Z"/>
+              <a class="map-pin" href="/plan.html?regions=sylhet&days=3&style=comfort" aria-label="Plan a trip to Sylhet and Srimangal">
+                <circle class="pin-halo" cx="300" cy="150" r="14"/><circle class="pin-dot" cx="300" cy="150" r="6.5"/>
+                <text class="pin-label" x="300" y="132" text-anchor="middle">Sylhet</text>
+              </a>
+              <a class="map-pin" href="/plan.html?regions=dhaka&days=3&style=comfort" aria-label="Plan a trip to Dhaka Gateway">
+                <circle class="pin-halo" cx="196" cy="250" r="14"/><circle class="pin-dot" cx="196" cy="250" r="6.5"/>
+                <text class="pin-label" x="196" y="232" text-anchor="middle">Dhaka</text>
+              </a>
+              <a class="map-pin" href="/plan.html?regions=hilltracts&days=4&style=comfort" aria-label="Plan a trip to the Chittagong Hill Tracts">
+                <circle class="pin-halo" cx="312" cy="330" r="14"/><circle class="pin-dot" cx="312" cy="330" r="6.5"/>
+                <text class="pin-label" x="312" y="312" text-anchor="middle">Hill Tracts</text>
+              </a>
+              <a class="map-pin" href="/plan.html?regions=sundarbans&days=5&style=comfort" aria-label="Plan a trip to the Sundarbans">
+                <circle class="pin-halo" cx="158" cy="392" r="14"/><circle class="pin-dot" cx="158" cy="392" r="6.5"/>
+                <text class="pin-label" x="158" y="374" text-anchor="middle">Sundarbans</text>
+              </a>
+              <a class="map-pin" href="/plan.html?regions=coxsbazar&days=4&style=comfort" aria-label="Plan a trip to Cox's Bazar and Saint Martin">
+                <circle class="pin-halo" cx="300" cy="430" r="14"/><circle class="pin-dot" cx="300" cy="430" r="6.5"/>
+                <text class="pin-label" x="300" y="452" text-anchor="middle">Cox's Bazar</text>
+              </a>
+            </svg>
+          </div>
+          <div class="map-copy">
+            <p class="eyebrow">Explore by map</p>
+            <h2>Where would you go?</h2>
+            <p class="lead" style="font-size:1.05rem">Tap a pin — or a region below — and the planner opens already pointed at that corner of the country. It's a shortcut into the tool, not a place to get lost.</p>
+            <ul class="map-links">
+              <li><a href="/plan.html?regions=dhaka&days=3&style=comfort">Dhaka Gateway <span>the capital</span></a></li>
+              <li><a href="/plan.html?regions=sundarbans&days=5&style=comfort">Sundarbans <span>mangrove cruise</span></a></li>
+              <li><a href="/plan.html?regions=coxsbazar&days=4&style=comfort">Cox's Bazar &amp; St Martin <span>coast &amp; island</span></a></li>
+              <li><a href="/plan.html?regions=sylhet&days=3&style=comfort">Sylhet &amp; Srimangal <span>tea hills</span></a></li>
+              <li><a href="/plan.html?regions=hilltracts&days=4&style=comfort">Chittagong Hill Tracts <span>the mountains</span></a></li>
+            </ul>
+            <a class="cta" href="plan.html">Build a full plan →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"><span></span></div>
+
     <!-- Regions -->
     <section class="section">
       <div class="wrap">
@@ -99,23 +149,23 @@
         <p class="lead" style="margin-bottom:2rem">Bangladesh packs mangroves, hill country, tea estates, a very long beach and a roaring capital into a country you can cross in a day. Pick the ones that pull at you.</p>
         <div class="grid grid-3">
           <a class="card region-card" href="regions/dhaka-gateway.html">
-            <div class="thumb"><span class="ph">Dhaka</span></div>
+            <div class="thumb"><span class="ph">Dhaka</span><img class="thumb-img" src="/assets/img/dhaka-gateway.webp" alt="Dhaka Gateway, Bangladesh" width="480" height="300" loading="lazy" decoding="async" onerror="this.style.display='none'"></div>
             <div class="body"><h3>Dhaka Gateway</h3><p>The loud, layered capital most trips start and end in.</p><p class="best">Best: Nov–Feb</p></div>
           </a>
           <a class="card region-card" href="regions/sundarbans.html">
-            <div class="thumb"><span class="ph">Sundarbans</span></div>
+            <div class="thumb"><span class="ph">Sundarbans</span><img class="thumb-img" src="/assets/img/sundarbans.webp" alt="The Sundarbans mangrove forest, Bangladesh" width="480" height="300" loading="lazy" decoding="async" onerror="this.style.display='none'"></div>
             <div class="body"><h3>Sundarbans</h3><p>The world's largest mangrove forest, reached only by boat.</p><p class="best">Best: Nov–Feb</p></div>
           </a>
           <a class="card region-card" href="regions/coxs-bazar-saint-martin.html">
-            <div class="thumb"><span class="ph">Cox's Bazar</span></div>
+            <div class="thumb"><span class="ph">Cox's Bazar</span><img class="thumb-img" src="/assets/img/coxs-bazar.webp" alt="Cox's Bazar beach, Bangladesh" width="480" height="300" loading="lazy" decoding="async" onerror="this.style.display='none'"></div>
             <div class="body"><h3>Cox's Bazar & Saint Martin</h3><p>A very long beach, and the country's only coral island.</p><p class="best">Best: Nov–Mar</p></div>
           </a>
           <a class="card region-card" href="regions/sylhet-srimangal.html">
-            <div class="thumb"><span class="ph">Sylhet</span></div>
+            <div class="thumb"><span class="ph">Sylhet</span><img class="thumb-img" src="/assets/img/sylhet.webp" alt="Tea estates near Srimangal, Sylhet, Bangladesh" width="480" height="300" loading="lazy" decoding="async" onerror="this.style.display='none'"></div>
             <div class="body"><h3>Sylhet & Srimangal</h3><p>Tea-carpet hills, wetlands and the greenest corner of the country.</p><p class="best">Best: Oct–Mar</p></div>
           </a>
           <a class="card region-card" href="regions/hill-tracts.html">
-            <div class="thumb"><span class="ph">Hill Tracts</span></div>
+            <div class="thumb"><span class="ph">Hill Tracts</span><img class="thumb-img" src="/assets/img/hill-tracts.webp" alt="Ridgelines of the Chittagong Hill Tracts, Bangladesh" width="480" height="300" loading="lazy" decoding="async" onerror="this.style.display='none'"></div>
             <div class="body"><h3>Chittagong Hill Tracts</h3><p>Bangladesh's mountain country — lakes, ridgelines and Indigenous cultures.</p><p class="best">Best: Nov–Feb</p></div>
           </a>
           <a class="card region-card" href="plan.html" style="align-items:center;justify-content:center;">
@@ -126,6 +176,22 @@
             </div>
           </a>
         </div>
+      </div>
+    </section>
+
+    <!-- Why plan here (short, action-focused strip) -->
+    <section class="section section--dark reasons-strip">
+      <div class="wrap">
+        <div class="reasons-head">
+          <p class="eyebrow">Why plan here</p>
+          <h2>A tool that respects your time.</h2>
+        </div>
+        <div class="reasons-grid">
+          <div class="reason"><span class="reason-mark">💰</span><h3>Honest numbers</h3><p>A cost range in your own currency — never a fake-precise quote.</p></div>
+          <div class="reason"><span class="reason-mark">🗺</span><h3>A real shape</h3><p>A day-by-day skeleton you can bend, not a rigid packaged tour.</p></div>
+          <div class="reason"><span class="reason-mark">🔗</span><h3>Yours to share</h3><p>Every plan is a link — send it and it rebuilds exactly.</p></div>
+        </div>
+        <div class="reasons-cta"><a class="cta cta-lg" href="plan.html">Start your plan →</a></div>
       </div>
     </section>
 
@@ -187,5 +253,6 @@
       });
     })();
   </script>
+  <script src="/assets/js/site.js" defer></script>
 </body>
 </html>

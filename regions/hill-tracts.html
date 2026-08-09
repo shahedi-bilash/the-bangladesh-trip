@@ -42,7 +42,7 @@
       <h1>Chittagong Hill Tracts</h1>
       <p class="lead">Bangladesh's mountain country — reservoir lakes, cloud-level ridgelines, and a mosaic of Indigenous cultures unlike anywhere else in the country.</p>
 
-      <div class="region-hero"><img src="../assets/img/hill-tracts.webp" alt="Green ridgelines of the Chittagong Hill Tracts near Bandarban, Bangladesh" width="1200" height="514" loading="lazy" onerror="this.style.display='none';this.parentNode.insertAdjacentHTML('beforeend','&lt;span class=\'ph\'&gt;Photo: Hill Tracts&lt;/span&gt;')"></div>
+      <div class="region-hero"><span class="ph">Photo: Hill Tracts</span><img src="../assets/img/hill-tracts.webp" alt="Green ridgelines of the Chittagong Hill Tracts near Bandarban, Bangladesh" width="1200" height="514" loading="lazy" decoding="async" onerror="this.style.display='none'"></div>
 
       <div class="chips">
         <span class="chip">Best: Nov–Feb</span>
@@ -105,5 +105,6 @@
     document.getElementById("year").textContent = new Date().getFullYear();
     (function(){var t=document.querySelector(".nav-toggle"),n=document.getElementById("nav");if(t&&n)t.addEventListener("click",function(){var o=n.classList.toggle("open");t.setAttribute("aria-expanded",o?"true":"false");});})();
   </script>
+  <script src="/assets/js/site.js" defer></script>
 </body>
 </html>

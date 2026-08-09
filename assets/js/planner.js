@@ -266,12 +266,49 @@
       curWrap.appendChild(b);
     });
     costCard.appendChild(curWrap);
-    root.appendChild(costCard);
+    // (costCard built above; assembled into the top grid below.)
 
-    /* Two-column: itinerary + side rail */
-    var grid = el("div", "result-grid");
+    /* Compact plan summary — pulls the trip shape up into the top-right rail */
+    var summaryCard = el("section", "card plan-summary");
+    summaryCard.appendChild(el("h3", "card-title", "Your plan"));
+    var sumList = el("dl", "summary-list");
+    function sumRow(k, v) { sumList.appendChild(el("dt", null, k)); sumList.appendChild(el("dd", null, v)); }
+    sumRow("Regions", regions.map(function (r) { return r.name; }).join(", "));
+    sumRow("Days", String(params.days));
+    sumRow("Style", styleName);
+    if (params.month) sumRow("When", params.month);
+    if (params.from) sumRow("From", params.from);
+    summaryCard.appendChild(sumList);
+    var visaQuick = resolveVisa(params.from);
+    if (visaQuick) summaryCard.appendChild(el("span", "visa-badge visa-" + visaQuick.summary, visaLabel(visaQuick.summary)));
+    var editLink = el("a", "text-link", "← Change these choices");
+    editLink.href = "plan.html?" + new URLSearchParams(window.location.search).toString();
+    editLink.addEventListener("click", function (e) { e.preventDefault(); showForm(); fillForm(getParams()); window.scrollTo({ top: 0, behavior: "smooth" }); });
+    summaryCard.appendChild(editLink);
 
-    /* Itinerary */
+    /* Trip essentials (booking basics), pulled up to the top rail */
+    var essCard = el("section", "card essentials-card");
+    essCard.appendChild(el("h3", "card-title", "Trip essentials"));
+    essCard.appendChild(el("p", "muted", "Book the basics — rooms, data and cover."));
+    ["booking", "agoda", "airalo", "insurance"].forEach(function (slug) {
+      var b = ctaButton(slug);
+      if (b) { b.classList.add("cta-block"); essCard.appendChild(b); }
+    });
+    essCard.appendChild(el("p", "small-print",
+      "We may earn a commission from bookings made through these links, at no extra cost to you."));
+
+    /* TOP row: cost (left) + compact rail (right) — 2-column from the top */
+    var topGrid = el("div", "result-grid");
+    topGrid.appendChild(costCard);
+    var topRail = el("div", "result-rail");
+    topRail.appendChild(summaryCard);
+    topRail.appendChild(essCard);
+    topGrid.appendChild(topRail);
+    root.appendChild(topGrid);
+
+    /* MAIN row: day-by-day (left) + visa & experiences (right) */
+    var mainGrid = el("div", "result-grid");
+
     var itinCard = el("section", "card");
     itinCard.appendChild(el("h3", "card-title", "Day by day"));
     itinCard.appendChild(el("p", "muted",
@@ -288,37 +325,32 @@
       list.appendChild(li);
     });
     itinCard.appendChild(list);
-    grid.appendChild(itinCard);
+    mainGrid.appendChild(itinCard);
 
-    /* Side rail: visa + experiences + booking */
     var rail = el("div", "result-rail");
 
-    // Visa
+    // Visa (full)
     var visa = resolveVisa(params.from);
     var visaCard = el("section", "card visa-card");
     visaCard.appendChild(el("h3", "card-title", "Visa"));
     if (visa) {
-      var badge = el("span", "visa-badge visa-" + visa.summary, visaLabel(visa.summary));
-      visaCard.appendChild(badge);
+      visaCard.appendChild(el("span", "visa-badge visa-" + visa.summary, visaLabel(visa.summary)));
       visaCard.appendChild(el("p", "muted", visa.note));
     } else {
       visaCard.appendChild(el("p", "muted", "Tell us your country to see the visa route."));
     }
-    var verify = el("p", "verify-note",
-      "⚠ Visa rules change often. Always confirm with an official Bangladesh mission or e-visa portal before booking flights.");
-    visaCard.appendChild(verify);
+    visaCard.appendChild(el("p", "verify-note",
+      "⚠ Visa rules change often. Always confirm with an official Bangladesh mission or e-visa portal before booking flights."));
     var visaMore = el("a", "text-link", "See the full visa summary →");
     visaMore.href = "visa.html";
     visaCard.appendChild(visaMore);
     rail.appendChild(visaCard);
 
-    // Experiences + booking CTAs (dedupe affiliates)
+    // Experiences + booking CTAs
     var expCard = el("section", "card");
     expCard.appendChild(el("h3", "card-title", "Experiences to book"));
-    var seenAff = {};
     regions.forEach(function (r) {
-      var rHead = el("p", "exp-region", r.name);
-      expCard.appendChild(rHead);
+      expCard.appendChild(el("p", "exp-region", r.name));
       r.experiences.forEach(function (x) {
         var item = el("div", "exp-item");
         item.appendChild(el("p", "exp-title", x.title));
@@ -326,24 +358,12 @@
         var cta = ctaButton(x.affiliate);
         if (cta) item.appendChild(cta);
         expCard.appendChild(item);
-        if (x.affiliate) seenAff[x.affiliate] = true;
       });
     });
     rail.appendChild(expCard);
 
-    // Essentials: hotels, eSIM, insurance
-    var essCard = el("section", "card");
-    essCard.appendChild(el("h3", "card-title", "Trip essentials"));
-    ["booking", "agoda", "airalo", "insurance"].forEach(function (slug) {
-      var b = ctaButton(slug);
-      if (b) { b.classList.add("cta-block"); essCard.appendChild(b); }
-    });
-    essCard.appendChild(el("p", "small-print",
-      "We may earn a commission from bookings made through these links, at no extra cost to you."));
-    rail.appendChild(essCard);
-
-    grid.appendChild(rail);
-    root.appendChild(grid);
+    mainGrid.appendChild(rail);
+    root.appendChild(mainGrid);
 
     /* Share bar */
     root.appendChild(buildShareBar());
