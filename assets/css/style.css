@@ -36,25 +36,29 @@ body {
   font-family: var(--sans);
   color: var(--ink);
   background-color: var(--cream);
-  /* faint traditional paisley texture — a whisper in the gutters/base sections */
-  background-image: url('/assets/img/pattern-paisley.svg');
-  background-size: 240px;
+  /* faint shapla (water-lily) motif — a whisper in the gutters/base sections */
+  background-image: url('/assets/img/pattern-motif.svg');
+  background-size: 200px;
   background-attachment: fixed;
   line-height: 1.6;
   font-size: 17px;
   -webkit-font-smoothing: antialiased;
 }
 
+/* Fast, subtle page fade-in on load (skipped under reduced-motion) */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes pageFade { from { opacity: 0; } to { opacity: 1; } }
+  body { animation: pageFade .22s ease both; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   * { animation: none !important; transition: none !important; }
-  html, a, button, .card, summary { cursor: auto; }
 }
 
-/* ---- Custom cursors (compass default, map-pin on interactive) ---- */
-html { cursor: url('../img/cursor-compass.png') 14 14, auto; }
-a, button, .card, summary { cursor: url('../img/cursor-pin.png') 14 14, pointer; }
-input, textarea, select { cursor: text; }
+/* Custom cursors are defined at the very end of this file, gated on
+   prefers-reduced-motion: no-preference so they fall back to auto, and
+   placed last so they win over per-component `cursor: pointer` rules. */
 
 /* ---- Typography ---- */
 h1, h2, h3, h4 { font-family: var(--serif); font-weight: 500; line-height: 1.12; color: var(--ink); margin: 0 0 .5em; letter-spacing: -0.01em; }
@@ -130,7 +134,7 @@ a:hover { text-decoration-color: currentColor; }
 .hero-overlay { position: absolute; inset: 0; z-index: 1; pointer-events: none;
   background: linear-gradient(180deg, rgba(4,51,34,.78) 0%, rgba(4,51,34,.86) 60%, rgba(4,51,34,.94) 100%); }
 .hero > .wrap { position: relative; z-index: 2; }
-.hero::after { content: ""; position: absolute; right: -90px; bottom: -110px; width: 480px; height: 480px; background: url('../img/emblem.png') center / contain no-repeat; opacity: .06; pointer-events: none; z-index: 1; }
+.hero::after { content: ""; position: absolute; right: clamp(12px, 4vw, 56px); bottom: clamp(12px, 4vw, 48px); width: clamp(150px, 35%, 320px); height: clamp(150px, 35%, 320px); background: url('/assets/img/emblem.png') center / contain no-repeat; opacity: .06; pointer-events: none; z-index: 1; }
 .hero .eyebrow { color: var(--sand); }
 .hero h1 { max-width: 15ch; color: #fff; }
 .hero .lead { margin-top: 1.1rem; color: rgba(255,255,255,.82); }
@@ -312,7 +316,7 @@ a:hover { text-decoration-color: currentColor; }
 .site-footer a { color: var(--cream); text-decoration: none; opacity: .85; display: block; padding: .25rem 0; font-size: .95rem; }
 .site-footer a:hover { opacity: 1; text-decoration: underline; }
 .footer-brand { font-family: var(--serif); font-size: 1.3rem; font-weight: 600; margin-bottom: .5rem; display: flex; align-items: center; gap: .5rem; }
-.footer-emblem { width: 24px; height: 24px; display: inline-block; flex: 0 0 auto; }
+.footer-emblem { width: 38px; height: 38px; display: inline-block; flex: 0 0 auto; }
 .footer-brand .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--sand); display: inline-block; margin-left: 2px; }
 .footer-about { font-size: .92rem; opacity: .8; max-width: 40ch; }
 .footer-bottom { border-top: 1px solid rgba(247,243,234,.15); margin-top: 2rem; padding-top: 1.5rem; font-size: .82rem; opacity: .7; display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; justify-content: space-between; }
@@ -322,8 +326,8 @@ a:hover { text-decoration-color: currentColor; }
 .map-layout { display: grid; grid-template-columns: minmax(0, 440px) 1fr; gap: clamp(1.5rem, 4vw, 3.5rem); align-items: center; }
 @media (max-width: 820px) { .map-layout { grid-template-columns: 1fr; } }
 .map-figure { display: flex; justify-content: center; }
-.bd-map { width: 100%; max-width: 400px; height: auto; overflow: visible; }
-.bd-outline { fill: rgba(11,110,79,.10); stroke: var(--teal); stroke-width: 2.5; stroke-linejoin: round; }
+.bd-map { width: 100%; max-width: 360px; height: auto; overflow: visible; }
+.bd-outline { fill: #E9F0EA; stroke: var(--teal); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
 .map-pin { cursor: pointer; }
 .pin-halo { fill: var(--sand); opacity: .18; transition: opacity .15s ease, r .15s ease; }
 .pin-dot { fill: var(--sand); stroke: var(--teal-600); stroke-width: 2; transition: r .15s ease; }
@@ -368,8 +372,61 @@ a:hover { text-decoration-color: currentColor; }
 .sticky-plan-emoji { font-size: 1.05rem; }
 @media (prefers-reduced-motion: reduce) { .sticky-plan { transition: opacity .2s ease; transform: none; } .sticky-plan.is-visible { transform: none; } }
 
+/* ---- Inner-page 2-column layout with a sticky action rail ---- */
+.page-layout { display: grid; grid-template-columns: minmax(0, 720px) 1fr; gap: clamp(1.5rem, 4vw, 3rem); align-items: start; }
+.page-layout > .article { max-width: 720px; margin: 0; }
+.page-rail { position: sticky; top: 88px; align-self: start; display: grid; gap: 1rem; }
+@media (max-width: 900px) {
+  .page-layout { grid-template-columns: 1fr; }
+  .page-rail { position: static; margin-top: 2rem; }
+}
+.rail-card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.25rem; box-shadow: var(--shadow); }
+.rail-card .rail-title { font-family: var(--serif); font-size: 1.15rem; margin: 0 0 .3rem; }
+.rail-card .rail-sub { font-size: .9rem; color: var(--ink-70); margin: 0 0 .9rem; }
+.rail-season { display: inline-flex; align-items: center; gap: .4rem; background: rgba(11,110,79,.08); color: var(--teal-600); border: 1px solid var(--line); border-radius: 999px; padding: .3rem .75rem; font-size: .82rem; font-weight: 600; margin-bottom: .9rem; }
+.rail-card .cta { display: flex; width: 100%; margin-bottom: .55rem; }
+.rail-book { display: flex; width: 100%; margin-bottom: .5rem; background: var(--sand); color: var(--ink); font-size: .9rem; padding: .6rem 1rem; }
+.rail-book:hover { background: #b58a33; color: var(--ink); }
+.rail-note { font-size: .78rem; color: var(--ink-70); margin: .6rem 0 0; }
+
+/* ---- Inline figures inside guide/region text (image + link, graceful fallback) ---- */
+.inline-figure { margin: 1.6rem 0; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); box-shadow: var(--shadow); text-decoration: none; color: inherit; display: block; }
+.inline-figure .if-media { position: relative; aspect-ratio: 16 / 8; background: linear-gradient(135deg, #d5e3d8, #ecdfc4); overflow: hidden; }
+.inline-figure .if-media img { position: relative; z-index: 1; width: 100%; height: 100%; object-fit: cover; display: block; }
+.inline-figure .if-media .ph { position: absolute; z-index: 0; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--serif); color: rgba(18,33,27,.4); }
+.inline-figure .if-cap { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: .7rem 1rem; background: var(--paper); font-size: .88rem; }
+.inline-figure .if-cap .if-go { color: var(--teal-600); font-weight: 600; white-space: nowrap; }
+.inline-figure:hover .if-cap .if-go { text-decoration: underline; }
+
+/* ---- Route progress bar (navigation feedback) ---- */
+.route-progress { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--sand); z-index: 200; opacity: 0; pointer-events: none; }
+.route-progress.active { width: 90%; opacity: 1; transition: width 8s cubic-bezier(.12,.72,.16,1); }
+@media (prefers-reduced-motion: reduce) { .route-progress { display: none; } }
+
+/* ---- Credits: photo-credit rows ---- */
+.credit-list { display: grid; gap: 1rem; margin: 1.5rem 0 2rem; }
+.credit-row { display: grid; grid-template-columns: 140px 1fr; gap: 1.2rem; align-items: center; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: .9rem; box-shadow: var(--shadow); }
+@media (max-width: 520px) { .credit-row { grid-template-columns: 1fr; } }
+.credit-thumb { position: relative; aspect-ratio: 4 / 3; border-radius: var(--radius-sm); overflow: hidden; background: linear-gradient(135deg, #d5e3d8, #ecdfc4); }
+.credit-thumb img { position: relative; z-index: 1; width: 100%; height: 100%; object-fit: cover; display: block; }
+.credit-thumb .ph { position: absolute; z-index: 0; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--serif); color: rgba(18,33,27,.4); font-size: .85rem; }
+.credit-place { font-family: var(--serif); font-size: 1.12rem; font-weight: 600; margin: 0 0 .2rem; }
+.credit-by { font-size: .9rem; margin: 0 0 .3rem; }
+.credit-by .credit-lic { color: var(--ink-70); }
+.credit-bio { font-size: .88rem; color: var(--ink-70); margin: 0; }
+
 /* Utility */
 [hidden] { display: none !important; }
 .center { text-align: center; }
 .mt-0 { margin-top: 0; }
 .stack > * + * { margin-top: 1rem; }
+
+/* ---- Custom cursors (last, so they beat per-component pointer rules;
+        gated on no-preference for a clean reduced-motion fallback) ---- */
+@media (prefers-reduced-motion: no-preference) {
+  html { cursor: url('/assets/img/cursor-compass.png') 16 16, auto; }
+  a, button, label, summary,
+  .card, .region-card, .crosslink, .cur-btn, .choice label,
+  .cta, .cta-ghost, .nav-cta, .nav-toggle, .rail-book, .map-links a, .map-pin { cursor: url('/assets/img/cursor-pin.png') 16 30, pointer; }
+  input, textarea, select { cursor: text; }
+}

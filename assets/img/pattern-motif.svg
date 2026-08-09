@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180">
+  <!-- Shapla (water lily) — Bangladesh's national flower. A whisper-level line motif. -->
+  <g fill="none" stroke="#0B6E4F" stroke-opacity="0.055" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- centred bloom: 8 radiating petals around (90,90) -->
+    <g>
+      <path d="M90 90 C82 68 82 52 90 36 C98 52 98 68 90 90 Z"/>
+      <path d="M90 90 C82 68 82 52 90 36 C98 52 98 68 90 90 Z" transform="rotate(45 90 90)"/>
+      <path d="M90 90 C82 68 82 52 90 36 C98 52 98 68 90 90 Z" transform="rotate(90 90 90)"/>
+      <path d="M90 90 C82 68 82 52 90 36 C98 52 98 68 90 90 Z" transform="rotate(135 90 90)"/>
+      <path d="M90 90 C82 68 82 52 90 36 C98 52 98 68 90 90 Z" transform="rotate(180 90 90)"/>
+      <path d="M90 90 C82 68 82 52 90 36 C98 52 98 68 90 90 Z" transform="rotate(225 90 90)"/>
+      <path d="M90 90 C82 68 82 52 90 36 C98 52 98 68 90 90 Z" transform="rotate(270 90 90)"/>
+      <path d="M90 90 C82 68 82 52 90 36 C98 52 98 68 90 90 Z" transform="rotate(315 90 90)"/>
+    </g>
+    <circle cx="90" cy="90" r="4"/>
+    <!-- corner buds complete across tile edges for a seamless repeat -->
+    <path d="M0 0 C10 12 14 22 8 34" stroke-opacity="0.04"/>
+    <path d="M180 0 C170 12 166 22 172 34" stroke-opacity="0.04"/>
+    <path d="M0 180 C10 168 14 158 8 146" stroke-opacity="0.04"/>
+    <path d="M180 180 C170 168 166 158 172 146" stroke-opacity="0.04"/>
+  </g>
+</svg>
