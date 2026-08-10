@@ -313,18 +313,68 @@
     itinCard.appendChild(el("h3", "card-title", "Day by day"));
     itinCard.appendChild(el("p", "muted",
       "A skeleton to shape your own trip around — not a fixed schedule."));
+    // Map region name → image slug
+    var IMG_SLUG = {
+      "Dhaka Gateway":           "dhaka-gateway",
+      "Sundarbans":              "sundarbans",
+      "Cox's Bazar & St Martin": "coxs-bazar",
+      "Sylhet & Srimangal":      "sylhet",
+      "Chittagong Hill Tracts":  "hill-tracts"
+    };
+
     var list = el("ol", "itinerary");
     buildItinerary(params).forEach(function (d) {
       var li = el("li", "itin-day");
+
+      // Thumbnail (96×72, 4:3, lazy, gradient fallback)
+      var slug = IMG_SLUG[d.region] || d.region.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+      var img = document.createElement("img");
+      img.className = "itin-thumb";
+      img.src = "/assets/img/" + slug + ".webp";
+      img.alt = d.region;
+      img.width = 96;
+      img.height = 72;
+      img.loading = "lazy";
+      img.decoding = "async";
+      img.onerror = function () { this.style.display = "none"; };
+      li.appendChild(img);
+
+      // Text body
+      var body = el("div", "itin-body");
       var top = el("div", "itin-top");
       top.appendChild(el("span", "itin-num", "Day " + d.day));
       top.appendChild(el("span", "itin-region", d.region));
-      li.appendChild(top);
-      li.appendChild(el("h4", "itin-title", d.title));
-      li.appendChild(el("p", "itin-detail", d.detail));
+      body.appendChild(top);
+      body.appendChild(el("h4", "itin-title", d.title));
+      body.appendChild(el("p", "itin-detail", d.detail));
+      li.appendChild(body);
+
       list.appendChild(li);
     });
     itinCard.appendChild(list);
+
+    // Closing action card at bottom of left column
+    var actCard = el("div", "plan-actions-card");
+    actCard.appendChild(el("p", "pac-label", "What next?"));
+    var editBtn = el("button", "cta-sm", "✎ Adjust these choices");
+    editBtn.type = "button";
+    editBtn.addEventListener("click", function () { showForm(); fillForm(getParams()); window.scrollTo({ top: 0, behavior: "smooth" }); });
+    actCard.appendChild(editBtn);
+    var regionLink = el("a", "cta-sm", "🗺 Plan another region");
+    regionLink.href = "plan.html";
+    actCard.appendChild(regionLink);
+    var copyBtn2 = el("button", "cta-sm", "🔗 Copy plan link");
+    copyBtn2.type = "button";
+    copyBtn2.addEventListener("click", function () {
+      var url = window.location.href;
+      var done = function () { copyBtn2.textContent = "✓ Copied!"; setTimeout(function () { copyBtn2.textContent = "🔗 Copy plan link"; }, 1800); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(done, function () { try { document.execCommand("copy"); done(); } catch (e) {} });
+      } else { try { document.execCommand("copy"); done(); } catch (e) {} }
+    });
+    actCard.appendChild(copyBtn2);
+    itinCard.appendChild(actCard);
+
     mainGrid.appendChild(itinCard);
 
     var rail = el("div", "result-rail");

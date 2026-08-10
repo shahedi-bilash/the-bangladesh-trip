@@ -120,6 +120,51 @@
       var dl = document.getElementById("v-list");
       all.sort().forEach(function (c) { var o = document.createElement("option"); o.value = c; dl.appendChild(o); });
 
+      // Route info copy (verbatim per brief)
+      var ROUTE_BLOCKS = {
+        visa_on_arrival: {
+          title: "Visa on arrival (eligible nationalities, tourism, at Dhaka airport)",
+          items: [
+            "Typically need: passport valid 6+ months, a confirmed return/onward ticket, a hotel booking, proof of sufficient funds, and a completed arrival form.",
+            "Time: issued on the spot at the airport (allow for queues).",
+            "Fee: paid on arrival; varies by nationality and length of stay.",
+            "Confirm eligibility with an official Bangladesh mission before you fly — conditions change."
+          ]
+        },
+        e_visa: {
+          title: "E-visa (apply online before you travel, where available)",
+          items: [
+            "Typically need: a scan of your passport bio page, a passport photo, return/onward ticket, hotel booking, proof of funds, an online form, and online fee payment.",
+            "Time: often a few business days up to about two weeks — apply early.",
+            "Fee: paid online; varies by nationality and duration.",
+            "Use only the official government e-visa portal, and check it covers your passport."
+          ]
+        },
+        embassy: {
+          title: "Apply in advance (embassy / high commission / consulate)",
+          items: [
+            "Typically need: application form, passport (6+ months), photos, return ticket, hotel booking, proof of funds or employment, sometimes an invitation; an appointment may be required.",
+            "Time: varies — start 2–4 weeks ahead.",
+            "Fee: set by the mission; varies.",
+            "Requirements differ by mission — check your nearest Bangladesh mission's website."
+          ]
+        }
+      };
+
+      function buildRouteBlock(summary) {
+        var cfg = ROUTE_BLOCKS[summary];
+        if (!cfg) return null;
+        var wrap = document.createElement("div"); wrap.className = "visa-route-block";
+        var h = document.createElement("h3"); h.textContent = cfg.title; wrap.appendChild(h);
+        var ul = document.createElement("ul");
+        cfg.items.forEach(function (item) { var li = document.createElement("li"); li.textContent = item; ul.appendChild(li); });
+        wrap.appendChild(ul);
+        var cav = document.createElement("p"); cav.className = "vr-caveat";
+        cav.textContent = "⚠ Always verify with an official Bangladesh mission or the government e-visa portal before booking flights. Rules and eligibility can change at any time.";
+        wrap.appendChild(cav);
+        return wrap;
+      }
+
       // lookup
       var input = document.getElementById("v-country");
       var out = document.getElementById("v-result");
@@ -131,15 +176,17 @@
         out.innerHTML = "";
         if (found) {
           var b = document.createElement("span"); b.className = "visa-badge visa-" + found.summary; b.textContent = labels[found.summary]; out.appendChild(b);
-          var p = document.createElement("p"); p.className = "muted"; p.style.margin = ".5rem 0 0"; p.textContent = found.note; out.appendChild(p);
+          var p = document.createElement("p"); p.className = "muted"; p.style.margin = ".5rem 0 .8rem"; p.textContent = found.note; out.appendChild(p);
+          var block = buildRouteBlock(found.summary);
+          if (block) out.appendChild(block);
         } else {
           var p2 = document.createElement("p"); p2.className = "muted"; p2.style.margin = "0";
           p2.textContent = "We don't have a rule on file for that country. Confirm your route directly with an official Bangladesh mission or the government e-visa portal.";
           out.appendChild(p2);
+          var warn = document.createElement("p"); warn.className = "verify-note"; warn.style.marginTop = ".7rem";
+          warn.textContent = "⚠ Verify with an official Bangladesh mission before booking. Rules change.";
+          out.appendChild(warn);
         }
-        var warn = document.createElement("p"); warn.className = "verify-note"; warn.style.marginTop = ".7rem";
-        warn.textContent = "⚠ Verify with an official Bangladesh mission before booking. Rules change.";
-        out.appendChild(warn);
       }
       input.addEventListener("input", lookup);
       input.addEventListener("change", lookup);
