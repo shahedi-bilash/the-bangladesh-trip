@@ -19,7 +19,8 @@ const FX = {
   AUD: { rate: 1.52,  symbol: "A$",  label: "AUD" },
   CAD: { rate: 1.37,  symbol: "C$",  label: "CAD" },
   INR: { rate: 83,    symbol: "₹",   label: "INR" },
-  JPY: { rate: 150,   symbol: "¥",   label: "JPY" }
+  JPY: { rate: 150,   symbol: "¥",   label: "JPY" },
+  BDT: { rate: 110,   symbol: "৳",   label: "BDT" }
 };
 
 /* ---- Shared per-trip / per-unit costs (not region-specific) ---- */
