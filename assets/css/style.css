@@ -356,7 +356,7 @@ a:hover { text-decoration-color: currentColor; }
 @keyframes draw { to { stroke-dashoffset: 0; } }
 .rose { fill: var(--sand); opacity: .9; }
 .rose-n { font: 700 11px var(--sans); fill: var(--teal-600); }
-.pin { cursor: url('/assets/img/cursor-pin.png') 16 30, pointer; }
+.pin { cursor: url('/assets/img/cursor-pin.png') 14 14, pointer; }
 .badge { fill: #FBF8F0; stroke: var(--sand); stroke-width: 2; transition: transform .18s ease, filter .18s ease; transform-box: fill-box; transform-origin: center; }
 .ic { pointer-events: none; }
 .pin .ring { fill: none; stroke: var(--sand); stroke-width: 2; opacity: .4; transform-box: fill-box; transform-origin: center; animation: pulse 2.8s ease-out infinite; }
@@ -489,8 +489,9 @@ a:hover { text-decoration-color: currentColor; }
         gated on no-preference for a clean reduced-motion fallback) ---- */
 @media (prefers-reduced-motion: no-preference) {
   html { cursor: url('/assets/img/cursor-compass.png') 16 16, auto; }
-  a, button, label, summary,
+  a, button, summary, label,
   .card, .region-card, .crosslink, .cur-btn, .choice label,
-  .cta, .cta-ghost, .nav-cta, .nav-toggle, .rail-book, .map-links a, .map-pin { cursor: url('/assets/img/cursor-pin.png') 16 30, pointer; }
+  .cta, .cta-ghost, .nav-cta, .nav-toggle, .rail-book, .map-links a, .map-pin,
+  input[type=submit], [role=button] { cursor: url('/assets/img/cursor-pin.png') 14 14, pointer; }
   input, textarea, select { cursor: text; }
 }
