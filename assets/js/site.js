@@ -38,9 +38,6 @@
     "bangladesh-trip-budget-2-weeks":   { region: "dhaka,sylhet,sundarbans,coxsbazar,hilltracts", days: 14, season: "Nov–Feb", name: "the full loop", exp: false },
     "cost-of-traveling-in-bangladesh":  { region: "", days: 7, season: "Nov–Feb", name: "your trip", exp: false },
     "bangladesh-visa-on-arrival":       { region: "", days: 7, season: "Nov–Feb", name: "your trip", exp: false },
-    "bangladesh-visa-for-us-citizens":  { region: "", days: 7, season: "Nov–Feb", name: "your trip", exp: false },
-    "is-bangladesh-safe-for-tourists":  { region: "", days: 7, season: "Nov–Feb", name: "your trip", exp: false },
-    "bangladesh-itinerary-for-first-time-visitors": { region: "dhaka,sundarbans,sylhet", days: 7, season: "Nov–Feb", name: "your first trip", exp: true },
     "about":                            { region: "", days: 7, season: "Nov–Feb", name: "your trip", exp: false }
   };
 

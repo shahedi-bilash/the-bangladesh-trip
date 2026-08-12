@@ -1,21 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://the-bangladesh-trip.pages.dev/</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://the-bangladesh-trip.pages.dev/plan</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://the-bangladesh-trip.pages.dev/cost-of-traveling-in-bangladesh</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://the-bangladesh-trip.pages.dev/7-day-bangladesh-itinerary-cost</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://the-bangladesh-trip.pages.dev/bangladesh-trip-budget-2-weeks</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://the-bangladesh-trip.pages.dev/sundarbans-tour-cost-from-dhaka</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://the-bangladesh-trip.pages.dev/bangladesh-visa-on-arrival</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://the-bangladesh-trip.pages.dev/bangladesh-visa-for-us-citizens</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://the-bangladesh-trip.pages.dev/is-bangladesh-safe-for-tourists</loc><lastmod>2026-08-12</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://the-bangladesh-trip.pages.dev/bangladesh-itinerary-for-first-time-visitors</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://the-bangladesh-trip.pages.dev/visa</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://the-bangladesh-trip.pages.dev/regions/dhaka-gateway</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://the-bangladesh-trip.pages.dev/regions/sundarbans</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://the-bangladesh-trip.pages.dev/regions/coxs-bazar-saint-martin</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://the-bangladesh-trip.pages.dev/regions/sylhet-srimangal</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://the-bangladesh-trip.pages.dev/regions/hill-tracts</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://the-bangladesh-trip.pages.dev/about</loc><lastmod>2026-08-12</lastmod><changefreq>yearly</changefreq><priority>0.4</priority></url>
-  <url><loc>https://the-bangladesh-trip.pages.dev/credits</loc><lastmod>2026-08-12</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://the-bangladesh-trip.pages.dev/</loc><changefreq>monthly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://the-bangladesh-trip.pages.dev/plan</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://the-bangladesh-trip.pages.dev/visa</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://the-bangladesh-trip.pages.dev/about</loc><changefreq>yearly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://the-bangladesh-trip.pages.dev/credits</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://the-bangladesh-trip.pages.dev/regions/dhaka-gateway</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://the-bangladesh-trip.pages.dev/regions/sundarbans</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://the-bangladesh-trip.pages.dev/regions/coxs-bazar-saint-martin</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://the-bangladesh-trip.pages.dev/regions/sylhet-srimangal</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://the-bangladesh-trip.pages.dev/regions/hill-tracts</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://the-bangladesh-trip.pages.dev/7-day-bangladesh-itinerary-cost</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://the-bangladesh-trip.pages.dev/bangladesh-trip-budget-2-weeks</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://the-bangladesh-trip.pages.dev/sundarbans-tour-cost-from-dhaka</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://the-bangladesh-trip.pages.dev/cost-of-traveling-in-bangladesh</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://the-bangladesh-trip.pages.dev/bangladesh-visa-on-arrival</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
 </urlset>
