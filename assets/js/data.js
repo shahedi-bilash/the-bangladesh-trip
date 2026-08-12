@@ -174,22 +174,26 @@ const VISA = [
   }
 ];
 
-/* ---- Affiliate program IDs. Fill these in when your accounts are live. ---- */
+/* ---- Affiliate program IDs.
+   For GetYourGuide, Viator and SafetyWing the tracking params live in
+   AFF_BASE (each program uses its own param name, not a generic ?aff=).
+   AFF is left "" for those so affLink() returns AFF_BASE directly.
+   booking/agoda/airalo still need their IDs — set to "TODO" until live. ---- */
 const AFF = {
-  booking:      "TODO",  // Booking.com
-  agoda:        "TODO",  // Agoda
-  getyourguide: "TODO",  // GetYourGuide
-  viator:       "TODO",  // Viator
-  airalo:       "TODO",  // Airalo (eSIM)
-  insurance:    "TODO"   // Insurance provider
+  booking:      "TODO",  // Booking.com affiliate ID — pending
+  agoda:        "TODO",  // Agoda affiliate ID — pending
+  getyourguide: "",      // partner_id embedded in AFF_BASE below
+  viator:       "",      // tracking params embedded in AFF_BASE below
+  airalo:       "TODO",  // Airalo affiliate ID — pending
+  insurance:    ""       // tracking params embedded in AFF_BASE below
 };
 
 /* ---- Where each affiliate slug points (used to build outbound links) ---- */
 const AFF_BASE = {
   booking:      "https://www.booking.com/",
   agoda:        "https://www.agoda.com/",
-  getyourguide: "https://www.getyourguide.com/",
-  viator:       "https://www.viator.com/",
+  getyourguide: "https://www.getyourguide.com/?partner_id=PNM6R9P",
+  viator:       "https://www.viator.com/?pid=P00314319&mcid=42383&medium=link",
   airalo:       "https://www.airalo.com/",
-  insurance:    "https://example.com/"  // TODO(owner): real provider URL
+  insurance:    "https://safetywing.com/?referenceID=26580082&utm_source=26580082&utm_medium=Ambassador"
 };

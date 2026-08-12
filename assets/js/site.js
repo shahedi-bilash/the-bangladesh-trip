@@ -73,9 +73,9 @@
     plan.textContent = cfg.region ? "Plan this region →" : "Plan your trip →";
     card.appendChild(plan);
 
-    // Affiliate "Book" buttons (base links; ids are added later)
+    // Affiliate "Book" buttons
     card.appendChild(affButton("Find hotels on Booking", "https://www.booking.com/"));
-    if (cfg.exp) card.appendChild(affButton("Book experiences", "https://www.getyourguide.com/"));
+    if (cfg.exp) card.appendChild(affButton("Book experiences", "https://www.getyourguide.com/?partner_id=PNM6R9P"));
 
     var note = document.createElement("p"); note.className = "rail-note";
     note.textContent = "We may earn a commission from bookings, at no extra cost to you.";
