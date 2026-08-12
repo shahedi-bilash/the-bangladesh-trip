@@ -129,7 +129,19 @@ a:hover { text-decoration-color: currentColor; }
 /* ---- Hero (full-bleed deep-green band, photo-ready) ---- */
 .hero { position: relative; overflow: hidden; color: #fff; padding: clamp(3rem, 8vw, 6rem) 0 clamp(2.5rem, 5vw, 4rem);
   background: radial-gradient(1200px 500px at 75% -10%, var(--teal) 0%, var(--teal-600) 45%, var(--green-900) 100%); }
-.hero--home { padding: clamp(4rem, 10vw, 8rem) 0 clamp(3rem, 6vw, 5rem); }
+/* Home hero: CSS background so background-attachment:fixed works.
+   overflow:hidden is removed on the home hero so the fixed bg isn't clipped at scroll. */
+.hero--home {
+  overflow: visible;
+  padding: clamp(4rem, 10vw, 8rem) 0 clamp(3rem, 6vw, 5rem);
+  background-image: url('/assets/img/hero.webp');
+  background-size: cover;
+  background-position: center;
+}
+/* Fixed parallax only on desktop — mobile Chrome/Safari jank badly with fixed backgrounds */
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .hero--home { background-attachment: fixed; }
+}
 .hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
 .hero-overlay { position: absolute; inset: 0; z-index: 1; pointer-events: none;
   background: linear-gradient(180deg, rgba(4,51,34,.78) 0%, rgba(4,51,34,.86) 60%, rgba(4,51,34,.94) 100%); }
