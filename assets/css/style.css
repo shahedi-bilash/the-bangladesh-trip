@@ -73,6 +73,8 @@ a:hover { text-decoration-color: currentColor; }
 .eyebrow { font-family: var(--sans); font-size: .78rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--sand); margin: 0 0 .6rem; }
 .muted { color: var(--ink-70); }
 .small-print { font-size: .82rem; color: var(--ink-70); margin: .8rem 0 0; }
+.aff-note { font-size: .78rem; color: var(--ink-70); margin: .25rem 0 .5rem; }
+.aff-inline { margin: .9rem 0 1.2rem; }
 .lead { font-size: 1.18rem; color: var(--ink-70); max-width: 60ch; }
 .text-link { display: inline-block; font-weight: 600; font-size: .95rem; margin-top: .4rem; }
 

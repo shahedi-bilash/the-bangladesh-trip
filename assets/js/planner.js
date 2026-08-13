@@ -225,9 +225,29 @@
     return base;
   }
   function affLabel(slug) {
-    return { booking: "Find hotels on Booking", agoda: "Find hotels on Agoda",
-      getyourguide: "Book on GetYourGuide", viator: "Book on Viator",
-      airalo: "Get an eSIM (Airalo)", insurance: "Compare travel insurance" }[slug] || "Book";
+    return {
+      booking:   "Find hotels on Booking",
+      agoda:     "Find hotels on Agoda",
+      flights:   "Search flights (Aviasales)",
+      transfer:  "Book airport transfer (Kiwitaxi)",
+      klook:     "Book on Klook",
+      wegotrip:  "Self-guided tours (WeGoTrip)",
+      tiqets:    "Buy attraction tickets (Tiqets)",
+      storage:   "Luggage storage (Radical Storage)",
+      airalo:    "Get an eSIM (Airalo)",
+      insurance: "Compare travel insurance"
+    }[slug] || "Book";
+  }
+  function affNote(slug) {
+    return {
+      flights:  "Compare airlines in one search",
+      transfer: "Fixed price, meet you at arrivals",
+      klook:    "Free cancellation on most tours",
+      wegotrip: "Free cancellation on most tours",
+      tiqets:   "Skip the ticket queue",
+      storage:  "City-centre drop-off from a few $/day",
+      airalo:   "Get online the minute you land"
+    }[slug] || null;
   }
   function ctaButton(slug) {
     var href = affLink(slug);
@@ -276,6 +296,12 @@
       row.appendChild(el("span", "cost-key", l.key));
       row.appendChild(el("span", "cost-val", fmtRange(l.range, cur)));
       table.appendChild(row);
+      // Inline Airalo CTA below the eSIM line
+      if (l.key.indexOf("eSIM") !== -1) {
+        var esimBtn = ctaButton("airalo");
+        if (esimBtn) { esimBtn.style.fontSize = ".8rem"; esimBtn.style.marginTop = ".25rem"; table.appendChild(esimBtn); }
+        table.appendChild(el("p", "aff-note", "Get online the minute you land"));
+      }
     });
     var totalRow = el("div", "cost-row cost-total");
     totalRow.appendChild(el("span", "cost-key", "Estimated total, per person"));
@@ -284,6 +310,10 @@
     costCard.appendChild(table);
     costCard.appendChild(el("p", "small-print",
       "Indicative estimate only — real cost varies with season, operator, group size and how you travel. Currency shown is approximate. Excludes international flights to and from Bangladesh."));
+    var flightsBtn = ctaButton("flights");
+    if (flightsBtn) { flightsBtn.classList.add("cta-block"); costCard.appendChild(flightsBtn); }
+    var flightsNote = el("p", "aff-note", "Compare airlines in one search");
+    costCard.appendChild(flightsNote);
     // Currency switcher
     var curWrap = el("div", "cur-switch");
     curWrap.appendChild(el("span", "cur-label", "Show in:"));
@@ -322,8 +352,8 @@
     /* Trip essentials (booking basics), pulled up to the top rail */
     var essCard = el("section", "card essentials-card");
     essCard.appendChild(el("h3", "card-title", "Trip essentials"));
-    essCard.appendChild(el("p", "muted", "Book the basics — rooms, data and cover."));
-    ["booking", "agoda", "airalo", "insurance"].forEach(function (slug) {
+    essCard.appendChild(el("p", "muted", "Book the basics — flights, rooms, data and cover."));
+    ["flights", "booking", "agoda", "airalo", "insurance"].forEach(function (slug) {
       var b = ctaButton(slug);
       if (b) { b.classList.add("cta-block"); essCard.appendChild(b); }
     });
@@ -439,7 +469,11 @@
         item.appendChild(el("p", "exp-title", x.title));
         item.appendChild(el("p", "exp-note", x.note));
         var cta = ctaButton(x.affiliate);
-        if (cta) item.appendChild(cta);
+        if (cta) {
+          item.appendChild(cta);
+          var note = affNote(x.affiliate);
+          if (note) item.appendChild(el("p", "aff-note", note));
+        }
         expCard.appendChild(item);
       });
     });

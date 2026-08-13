@@ -56,9 +56,9 @@ const REGIONS = [
     minDays: 2,
     perDayUSD: { backpacker: [14, 28], comfort: [40, 85], premium: [110, 240] },
     experiences: [
-      { title: "Old Dhaka on foot", note: "Shankhari Bazar lanes, Ahsan Manzil (the Pink Palace), and a cycle-rickshaw through the crush.", affiliate: "getyourguide" },
-      { title: "Sunset boat on the Buriganga", note: "A rented rowboat through the busiest river port you'll ever see. Go with the light low.", affiliate: "viator" },
-      { title: "Day trip to Sonargaon", note: "The old capital and Panam City's abandoned merchant street, about an hour out of town.", affiliate: "getyourguide" }
+      { title: "Old Dhaka on foot", note: "Shankhari Bazar lanes, Ahsan Manzil (the Pink Palace), and a cycle-rickshaw through the crush.", affiliate: "klook" },
+      { title: "Sunset boat on the Buriganga", note: "A rented rowboat through the busiest river port you'll ever see. Go with the light low.", affiliate: "wegotrip" },
+      { title: "Day trip to Sonargaon", note: "The old capital and Panam City's abandoned merchant street, about an hour out of town.", affiliate: "klook" }
     ],
     dayTemplates: [
       { title: "Land, settle, first walk", detail: "Arrive, drop bags, and ease in with an evening wander and street food near your neighbourhood." },
@@ -79,9 +79,9 @@ const REGIONS = [
     minDays: 3,
     perDayUSD: { backpacker: [45, 80], comfort: [80, 150], premium: [160, 300] },
     experiences: [
-      { title: "3-day live-aboard cruise", note: "Sleep on the boat, wake in the mangroves. Permits, guide and forest fees are bundled by the operator.", affiliate: "viator" },
-      { title: "Guided creek safari", note: "Small-boat runs up the narrow channels at dawn — the best window for wildlife.", affiliate: "getyourguide" },
-      { title: "Watchtower & village stop", note: "Karamjal or Kotka watchtowers, plus a visit to a forest-edge community.", affiliate: "getyourguide" }
+      { title: "3-day live-aboard cruise", note: "Sleep on the boat, wake in the mangroves. Permits, guide and forest fees are bundled by the operator.", affiliate: "wegotrip" },
+      { title: "Guided creek safari", note: "Small-boat runs up the narrow channels at dawn — the best window for wildlife.", affiliate: "klook" },
+      { title: "Watchtower & village stop", note: "Karamjal or Kotka watchtowers, plus a visit to a forest-edge community.", affiliate: "klook" }
     ],
     dayTemplates: [
       { title: "Khulna & board the boat", detail: "Travel to Khulna/Mongla, meet the operator, board, and cruise into the forest as the light drops." },
@@ -101,8 +101,8 @@ const REGIONS = [
     minDays: 3,
     perDayUSD: { backpacker: [16, 32], comfort: [45, 95], premium: [120, 260] },
     experiences: [
-      { title: "Saint Martin's day or overnight", note: "Boat out to the coral island for snorkelling and a night under very dark skies. Check current access rules first.", affiliate: "getyourguide" },
-      { title: "Himchari & Inani Beach drive", note: "The coast road south past waterfalls and the quieter, rockier southern beaches.", affiliate: "viator" },
+      { title: "Saint Martin's day or overnight", note: "Boat out to the coral island for snorkelling and a night under very dark skies. Check current access rules first.", affiliate: "klook" },
+      { title: "Himchari & Inani Beach drive", note: "The coast road south past waterfalls and the quieter, rockier southern beaches.", affiliate: "wegotrip" },
       { title: "Fishing harbour at dawn", note: "The catch coming in at Cox's Bazar's working harbour — early, raw, and free.", affiliate: "" }
     ],
     dayTemplates: [
@@ -124,9 +124,9 @@ const REGIONS = [
     minDays: 2,
     perDayUSD: { backpacker: [13, 26], comfort: [38, 80], premium: [100, 210] },
     experiences: [
-      { title: "Tea-estate walk & seven-layer tea", note: "Wander the estates around Srimangal, then the famous layered tea in a roadside cabin.", affiliate: "getyourguide" },
-      { title: "Lawachara rainforest trek", note: "A guided walk for gibbons and birds in the national park.", affiliate: "viator" },
-      { title: "Ratargul swamp forest by boat", note: "A rowboat through Bangladesh's freshwater swamp forest — best when water is high.", affiliate: "getyourguide" }
+      { title: "Tea-estate walk & seven-layer tea", note: "Wander the estates around Srimangal, then the famous layered tea in a roadside cabin.", affiliate: "klook" },
+      { title: "Lawachara rainforest trek", note: "A guided walk for gibbons and birds in the national park.", affiliate: "wegotrip" },
+      { title: "Ratargul swamp forest by boat", note: "A rowboat through Bangladesh's freshwater swamp forest — best when water is high.", affiliate: "klook" }
     ],
     dayTemplates: [
       { title: "Into the tea hills", detail: "Train or fly in, base yourself in Srimangal, and walk the nearest estates at golden hour." },
@@ -146,8 +146,8 @@ const REGIONS = [
     minDays: 3,
     perDayUSD: { backpacker: [15, 30], comfort: [42, 90], premium: [110, 230] },
     experiences: [
-      { title: "Boat on Kaptai Lake", note: "A long, quiet day on the reservoir around Rangamati, hopping islands and hanging bridges.", affiliate: "getyourguide" },
-      { title: "Nilgiri & Chimbuk ridgeline", note: "The high road above Bandarban — cloud-level viewpoints and hill villages.", affiliate: "viator" },
+      { title: "Boat on Kaptai Lake", note: "A long, quiet day on the reservoir around Rangamati, hopping islands and hanging bridges.", affiliate: "klook" },
+      { title: "Nilgiri & Chimbuk ridgeline", note: "The high road above Bandarban — cloud-level viewpoints and hill villages.", affiliate: "wegotrip" },
       { title: "Golden Temple & local markets", note: "The Buddhist temple above Bandarban and the weekly markets where hill communities trade.", affiliate: "" }
     ],
     dayTemplates: [
@@ -382,25 +382,33 @@ const VISA = [
 ];
 
 /* ---- Affiliate program IDs.
-   For GetYourGuide, Viator and SafetyWing the tracking params live in
-   AFF_BASE (each program uses its own param name, not a generic ?aff=).
-   AFF is left "" for those so affLink() returns AFF_BASE directly.
-   booking/agoda/airalo still need their IDs — set to "TODO" until live. ---- */
+   All Travelpayouts links embed tracking in the URL itself, so AFF is ""
+   (falsy) — affLink() returns AFF_BASE directly without appending ?aff=.
+   booking/agoda still need their IDs — set to "TODO" until live. ---- */
 const AFF = {
-  booking:      "TODO",  // Booking.com affiliate ID — pending
-  agoda:        "TODO",  // Agoda affiliate ID — pending
-  getyourguide: "",      // partner_id embedded in AFF_BASE below
-  viator:       "",      // tracking params embedded in AFF_BASE below
-  airalo:       "TODO",  // Airalo affiliate ID — pending
-  insurance:    ""       // tracking params embedded in AFF_BASE below
+  booking:   "TODO",  // Booking.com affiliate ID — pending
+  agoda:     "TODO",  // Agoda affiliate ID — pending
+  flights:   "",      // Aviasales via Travelpayouts
+  transfer:  "",      // Kiwitaxi via Travelpayouts
+  klook:     "",      // Klook via Travelpayouts
+  wegotrip:  "",      // WeGoTrip via Travelpayouts
+  tiqets:    "",      // Tiqets via Travelpayouts
+  storage:   "",      // Radical Storage via Travelpayouts
+  airalo:    "",      // Airalo eSIM via Travelpayouts
+  insurance: ""       // SafetyWing — tracking params in AFF_BASE below
 };
 
 /* ---- Where each affiliate slug points (used to build outbound links) ---- */
 const AFF_BASE = {
-  booking:      "https://www.booking.com/",
-  agoda:        "https://www.agoda.com/",
-  getyourguide: "https://www.getyourguide.com/?partner_id=PNM6R9P&utm_medium=online_publisher",
-  viator:       "https://www.viator.com/?pid=P00314319&mcid=42383&medium=link",
-  airalo:       "https://www.airalo.com/",
-  insurance:    "https://safetywing.com/?referenceID=26580082&utm_source=26580082&utm_medium=Ambassador"
+  booking:   "https://www.booking.com/",
+  agoda:     "https://www.agoda.com/",
+  flights:   "https://aviasales.tpm.li/GsTszCxG",
+  transfer:  "https://kiwitaxi.tpm.li/pROaHRyF",
+  klook:     "https://klook.tpm.li/KKQ1Iup8",
+  wegotrip:  "https://wegotrip.tpm.li/7ePkVwoe",
+  tiqets:    "https://tiqets.tpm.li/Fc1NrTjO",
+  storage:   "https://radicalstorage.tpm.li/2tNxaXr7",
+  airalo:    "https://airalo.tpm.li/L8mCQlNF",
+  insurance: "https://safetywing.com/?referenceID=26580082&utm_source=26580082&utm_medium=Ambassador",
+  getyourguide: "https://www.getyourguide.com/?partner_id=PNM6R9P&utm_medium=online_publisher"  // site.js rail
 };
