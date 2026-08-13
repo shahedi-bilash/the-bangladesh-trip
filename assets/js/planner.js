@@ -318,6 +318,7 @@
     var curWrap = el("div", "cur-switch");
     curWrap.appendChild(el("span", "cur-label", "Show in:"));
     Object.keys(FX).forEach(function (code) {
+      if (FX[code].hidden) return; // auto-selected only, not a switcher button
       var b = el("button", "cur-btn" + (code === cur ? " is-active" : ""), code);
       b.type = "button";
       b.addEventListener("click", function () {

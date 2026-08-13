@@ -78,6 +78,7 @@
 
     // Affiliate "Book" buttons
     card.appendChild(affButton("Find hotels on Booking", "https://www.booking.com/"));
+    card.appendChild(affButton("Compare airlines in one search", "https://aviasales.tpm.li/GsTszCxG"));
     if (cfg.exp) card.appendChild(affButton("Book experiences", "https://www.getyourguide.com/?partner_id=PNM6R9P&utm_medium=online_publisher"));
 
     var note = document.createElement("p"); note.className = "rail-note";

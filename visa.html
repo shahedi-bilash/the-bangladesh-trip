@@ -26,7 +26,7 @@
       <a class="brand" href="index.html"><img class="brand-emblem" src="assets/img/emblem.png" alt="" width="34" height="34"> The Bangladesh Trip</a>
       <button class="nav-toggle" aria-expanded="false" aria-controls="nav" aria-label="Menu">☰</button>
       <nav class="nav" id="nav">
-        <a href="regions/dhaka-gateway.html">Regions</a>
+        <a href="regions/">Regions</a>
         <a href="cost-of-traveling-in-bangladesh.html">Costs</a>
         <a href="visa.html">Visa</a>
         <a href="about.html">About</a>
@@ -68,7 +68,7 @@
       <h2>Stay connected from arrival</h2>
       <p>An eSIM lets you land with data already active — no queuing at a SIM counter after a long flight. Pick up a Bangladesh data pack before you travel and activate it the moment you switch on.</p>
       <div class="aff-inline">
-        <a class="cta-ghost" href="https://airalo.tpm.li/L8mCQlNF" target="_blank" rel="sponsored noopener">Get a Bangladesh eSIM (Airalo)</a>
+        <a class="cta-aff" href="https://airalo.tpm.li/L8mCQlNF" target="_blank" rel="sponsored noopener">Get a Bangladesh eSIM (Airalo)</a>
         <p class="aff-note">Get online the minute you land</p>
       </div>
 
@@ -90,7 +90,7 @@
           <p class="footer-about">An independent, personal trip-planning tool for people travelling to Bangladesh. Not affiliated with any government body or tourism board.</p>
         </div>
         <div><h4>Plan</h4><a href="plan.html">Trip planner</a><a href="cost-of-traveling-in-bangladesh.html">Costs</a><a href="visa.html">Visa summary</a></div>
-        <div><h4>Explore</h4><a href="regions/dhaka-gateway.html">Regions</a><a href="about.html">About</a><a href="credits.html">Image & data credits</a></div>
+        <div><h4>Explore</h4><a href="regions/">Regions</a><a href="about.html">About</a><a href="credits.html">Image & data credits</a></div>
       </div>
       <p class="footer-disclosure">Some links on this site are affiliate links. We may earn a commission from bookings made through them, at no extra cost to you. Cost estimates are indicative and visa rules must always be verified with an official source.</p>
       <div class="footer-bottom"><span>© <span id="year"></span> The Bangladesh Trip by Shahedi Bilash. An independent project.</span><span>Made for travellers, not for a board.</span></div>
@@ -123,9 +123,12 @@
         wrap.appendChild(chips);
         groupsEl.appendChild(wrap);
       });
-      // datalist
+      // datalist — also include every country from COUNTRIES not already listed
+      if (typeof COUNTRIES !== "undefined") {
+        COUNTRIES.forEach(function (c) { if (all.indexOf(c.name) === -1) all.push(c.name); });
+      }
       var dl = document.getElementById("v-list");
-      all.sort().forEach(function (c) { var o = document.createElement("option"); o.value = c; dl.appendChild(o); });
+      all.slice().sort().forEach(function (c) { var o = document.createElement("option"); o.value = c; dl.appendChild(o); });
 
       // Route info copy (verbatim per brief)
       var ROUTE_BLOCKS = {
@@ -179,7 +182,16 @@
         var lc = (input.value || "").trim().toLowerCase();
         if (!lc) { out.innerHTML = ""; return; }
         var found = null;
+        // Check VISA groups first (most detailed notes)
         VISA.forEach(function (g) { g.countries.forEach(function (c) { if (c.toLowerCase() === lc) found = g; }); });
+        // Fall back to COUNTRIES array for any country not in VISA
+        if (!found && typeof COUNTRIES !== "undefined") {
+          COUNTRIES.forEach(function (c) {
+            if (c.name.toLowerCase() === lc) {
+              found = { summary: c.visa, note: "General route based on nationality. Confirm the current rules with an official Bangladesh mission before you travel." };
+            }
+          });
+        }
         out.innerHTML = "";
         if (found) {
           var b = document.createElement("span"); b.className = "visa-badge visa-" + found.summary; b.textContent = labels[found.summary]; out.appendChild(b);
