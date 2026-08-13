@@ -74,9 +74,42 @@
   function addR(a, b) { return [a[0] + b[0], a[1] + b[1]]; }
   function scaleR(a, k) { return [a[0] * k, a[1] * k]; }
 
+  /* ---------- country helpers ---------- */
+  function findCountry(country) {
+    if (!country || typeof COUNTRIES === "undefined") return null;
+    var lc = country.trim().toLowerCase();
+    for (var i = 0; i < COUNTRIES.length; i++) {
+      if (COUNTRIES[i].name.toLowerCase() === lc) return COUNTRIES[i];
+    }
+    return null;
+  }
+
+  /* Return FX currency code for a country, or null if unknown / no FX entry. */
+  function resolveCountryCurrency(country) {
+    var c = findCountry(country);
+    if (!c) return null;
+    return FX[c.currency] ? c.currency : "USD";
+  }
+
   /* ---------- visa resolver ---------- */
   function resolveVisa(country) {
     if (!country) return null;
+    var c = findCountry(country);
+    if (c) {
+      var v = c.visa;
+      // Find matching VISA group for the rich note text
+      for (var k = 0; k < VISA.length; k++) {
+        if (VISA[k].summary === v) return VISA[k];
+      }
+      // Fallback notes when group not in legacy VISA array
+      if (v === "visa_on_arrival") return { group: "Visa on arrival", summary: "visa_on_arrival",
+        note: "Your nationality may qualify for a visa on arrival at Dhaka airport. Conditions and eligibility change — always confirm with an official Bangladesh mission before you fly." };
+      if (v === "e_visa") return { group: "e-Visa", summary: "e_visa",
+        note: "An e-visa may be available for your nationality. Check the official Bangladesh e-visa portal and apply well in advance." };
+      return { group: "Apply in advance", summary: "embassy",
+        note: "Travellers from " + country + " should arrange a visa before arrival through a Bangladesh embassy, consulate or e-visa portal." };
+    }
+    // Legacy VISA array fallback
     var lc = country.trim().toLowerCase();
     for (var i = 0; i < VISA.length; i++) {
       var g = VISA[i];
@@ -518,7 +551,9 @@
     p.set("style", state.style);
     if (state.from) p.set("from", state.from);
     if (state.month) p.set("month", state.month);
-    var cur = getParams().cur;
+    // Auto-set display currency from the selected country; fall back to current URL param.
+    var autoCur = state.from ? resolveCountryCurrency(state.from) : null;
+    var cur = autoCur || getParams().cur;
     if (cur && cur !== "USD") p.set("cur", cur);
     return p.toString();
   }
@@ -539,6 +574,19 @@
   function initPlanner() {
     var form = $("#planner-form");
     var params = getParams();
+
+    // Populate the country datalist from COUNTRIES data
+    if (typeof COUNTRIES !== "undefined") {
+      var dl = document.getElementById("country-list");
+      if (dl) {
+        dl.innerHTML = "";
+        COUNTRIES.forEach(function (c) {
+          var opt = document.createElement("option");
+          opt.value = c.name;
+          dl.appendChild(opt);
+        });
+      }
+    }
 
     if (form) {
       fillForm(params);

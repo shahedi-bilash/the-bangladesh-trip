@@ -113,14 +113,7 @@
                 <label class="field-label" for="f-from">Where are you flying from?</label>
                 <p class="field-help">For your visa route & currency.</p>
                 <input class="input" list="country-list" id="f-from" name="from" placeholder="e.g. United Kingdom" autocomplete="country-name">
-                <datalist id="country-list">
-                  <option>United States</option><option>United Kingdom</option><option>Canada</option>
-                  <option>Australia</option><option>Germany</option><option>France</option>
-                  <option>Italy</option><option>Spain</option><option>Netherlands</option>
-                  <option>Japan</option><option>South Korea</option><option>Singapore</option>
-                  <option>India</option><option>China</option><option>United Arab Emirates</option>
-                  <option>Saudi Arabia</option><option>Thailand</option><option>Malaysia</option>
-                </datalist>
+                <datalist id="country-list"><!-- populated by planner.js from COUNTRIES --></datalist>
               </div>
               <div>
                 <label class="field-label" for="f-month">Roughly when? <span style="font-weight:400;color:var(--ink-70)">(optional)</span></label>
