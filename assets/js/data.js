@@ -29,8 +29,8 @@ const FX = {
   BDT: { rate: 110,   symbol: "৳",   label: "BDT" },
   /* Hidden currencies — auto-selected for countries whose native currency
      isn't one of the main switcher options; not shown as switcher buttons. */
-  NPR: { rate: 133,   symbol: "Rs",   label: "NPR",  hidden: true },
-  NZD: { rate: 1.62,  symbol: "NZ$",  label: "NZD",  hidden: true }
+  NPR: { rate: 133,   symbol: "Rs",   label: "NPR" },
+  NZD: { rate: 1.62,  symbol: "NZ$",  label: "NZD" }
 };
 
 /* ---- Shared per-trip / per-unit costs (not region-specific) ---- */
@@ -390,7 +390,7 @@ const VISA = [
    (falsy) — affLink() returns AFF_BASE directly without appending ?aff=.
    booking/agoda still need their IDs — set to "TODO" until live. ---- */
 const AFF = {
-  booking:   "TODO",  // Booking.com affiliate ID — pending
+  booking:   "",      // Booking.com: tracking is in AFF_BASE CJ URL
   agoda:     "TODO",  // Agoda affiliate ID — pending
   flights:   "",      // Aviasales via Travelpayouts
   transfer:  "",      // Kiwitaxi via Travelpayouts
@@ -404,7 +404,7 @@ const AFF = {
 
 /* ---- Where each affiliate slug points (used to build outbound links) ---- */
 const AFF_BASE = {
-  booking:   "https://www.booking.com/",
+  booking:   "https://www.tkqlhce.com/click-101858699-17293139?url=https%3A%2F%2Fwww.booking.com%2Fcountry%2Fbd.html",
   agoda:     "https://www.agoda.com/",
   flights:   "https://aviasales.tpm.li/GsTszCxG",
   transfer:  "https://kiwitaxi.tpm.li/pROaHRyF",

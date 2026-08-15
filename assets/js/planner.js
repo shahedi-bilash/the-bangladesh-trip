@@ -209,6 +209,20 @@
         });
       }
     });
+
+    // Replace the last day with a departure note — never schedule sightseeing
+    // on flight day. If not ending in Dhaka, prompt travellers to return early.
+    if (plan.length > 0) {
+      var last = plan[plan.length - 1];
+      var leavingFromDhaka = last.region === "Dhaka Gateway";
+      last.title = leavingFromDhaka
+        ? "Fly home from Dhaka"
+        : "Return to Dhaka — fly home";
+      last.detail = leavingFromDhaka
+        ? "Head to Hazrat Shahjalal International Airport (DAC). Allow extra time for Dhaka traffic — no new sightseeing on departure day."
+        : "Travel back to Dhaka today so you're not rushing on flight day. International flights leave from Hazrat Shahjalal (DAC) — aim to arrive in the city the evening before. No new sightseeing on departure day.";
+    }
+
     return plan;
   }
 
@@ -318,7 +332,6 @@
     var curWrap = el("div", "cur-switch");
     curWrap.appendChild(el("span", "cur-label", "Show in:"));
     Object.keys(FX).forEach(function (code) {
-      if (FX[code].hidden) return; // auto-selected only, not a switcher button
       var b = el("button", "cur-btn" + (code === cur ? " is-active" : ""), code);
       b.type = "button";
       b.addEventListener("click", function () {
@@ -586,9 +599,10 @@
     p.set("style", state.style);
     if (state.from) p.set("from", state.from);
     if (state.month) p.set("month", state.month);
-    // Auto-set display currency from the selected country; fall back to current URL param.
-    var autoCur = state.from ? resolveCountryCurrency(state.from) : null;
-    var cur = autoCur || getParams().cur;
+    // Currency: only carry cur when the user has explicitly picked it via the
+    // switcher. Country selection sets the visa route, not the currency.
+    // Default display is always USD on first load.
+    var cur = getParams().cur;
     if (cur && cur !== "USD") p.set("cur", cur);
     return p.toString();
   }
