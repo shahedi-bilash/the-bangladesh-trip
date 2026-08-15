@@ -127,8 +127,9 @@ a:hover { text-decoration-color: currentColor; }
 .cta-lg { font-size: 1.08rem; padding: .95rem 1.8rem; }
 .cta-block { display: flex; width: 100%; margin-bottom: .55rem; }
 /* .cta-aff is self-contained — gold/sand fill, used standalone or with .cta */
-.cta-aff { display: inline-flex; align-items: center; justify-content: center; font-family: var(--sans); font-size: .9rem; font-weight: 600; padding: .65rem 1.2rem; border-radius: 999px; text-decoration: none; cursor: pointer; background: var(--sand); color: var(--ink); border: 0; margin-top: .5rem; transition: background .15s ease; }
-.cta-aff:hover { background: #b08830; color: var(--ink); }
+.cta-aff { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; font-family: var(--sans); font-size: .9rem; font-weight: 600; padding: .65rem 1.2rem; border-radius: 999px; text-decoration: none; cursor: pointer; background: var(--sand); color: var(--ink); border: 0; margin-top: .5rem; transition: background .15s ease, transform .15s ease; }
+.cta-aff:hover { background: #b08830; color: var(--ink); transform: translateY(-1px); }
+.cta-aff .aff-icon { width: 18px; height: 18px; border-radius: 3px; flex-shrink: 0; display: block; }
 
 /* ---- Hero (full-bleed deep-green band, photo-ready) ---- */
 .hero { position: relative; overflow: hidden; color: #fff; padding: clamp(3rem, 8vw, 6rem) 0 clamp(2.5rem, 5vw, 4rem);
@@ -480,8 +481,9 @@ a:hover { text-decoration-color: currentColor; }
 .rail-card .rail-sub { font-size: .9rem; color: var(--ink-70); margin: 0 0 .9rem; }
 .rail-season { display: inline-flex; align-items: center; gap: .4rem; background: rgba(11,110,79,.08); color: var(--teal-600); border: 1px solid var(--line); border-radius: 999px; padding: .3rem .75rem; font-size: .82rem; font-weight: 600; margin-bottom: .9rem; }
 .rail-card .cta { display: flex; width: 100%; margin-bottom: .55rem; }
-.rail-book { display: flex; width: 100%; margin-bottom: .5rem; background: var(--sand); color: var(--ink); font-size: .9rem; padding: .6rem 1rem; }
-.rail-book:hover { background: #b58a33; color: var(--ink); }
+.rail-book { display: flex; width: 100%; margin-bottom: .5rem; align-items: center; gap: .5rem; background: var(--sand); color: var(--ink); font-family: var(--sans); font-size: .9rem; font-weight: 600; padding: .6rem 1.1rem; border-radius: 999px; text-decoration: none; cursor: pointer; transition: background .15s ease, transform .15s ease; }
+.rail-book:hover { background: #b58a33; color: var(--ink); transform: translateY(-1px); }
+.rail-book .aff-icon { width: 18px; height: 18px; border-radius: 3px; flex-shrink: 0; display: block; }
 .rail-note { font-size: .78rem; color: var(--ink-70); margin: .6rem 0 0; }
 
 /* ---- Inline figures inside guide/region text (image + link, graceful fallback) ---- */

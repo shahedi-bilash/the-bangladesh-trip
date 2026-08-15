@@ -44,13 +44,24 @@
     "about":                            { region: "", days: 7, season: "Nov–Feb", name: "your trip", exp: false }
   };
 
-  function affButton(label, href) {
+  function affButton(label, href, domain) {
     var a = document.createElement("a");
     a.className = "rail-book";
     a.href = href;
     a.target = "_blank";
     a.rel = "sponsored noopener";
-    a.textContent = label;
+    if (domain) {
+      var img = document.createElement("img");
+      img.className = "aff-icon";
+      img.src = "https://www.google.com/s2/favicons?domain=" + domain + "&sz=32";
+      img.alt = "";
+      img.width = 18;
+      img.height = 18;
+      a.appendChild(img);
+    }
+    var span = document.createElement("span");
+    span.textContent = label;
+    a.appendChild(span);
     return a;
   }
 
@@ -77,9 +88,9 @@
     card.appendChild(plan);
 
     // Affiliate "Book" buttons
-    card.appendChild(affButton("Find hotels on Booking", "https://www.tkqlhce.com/click-101858699-17293139?url=https%3A%2F%2Fwww.booking.com%2Fcountry%2Fbd.html"));
-    card.appendChild(affButton("Compare airlines in one search", "https://aviasales.tpm.li/GsTszCxG"));
-    if (cfg.exp) card.appendChild(affButton("Book experiences", "https://www.getyourguide.com/?partner_id=PNM6R9P&utm_medium=online_publisher"));
+    card.appendChild(affButton("Find hotels on Booking", "https://www.tkqlhce.com/click-101858699-17293139?url=https%3A%2F%2Fwww.booking.com%2Fcountry%2Fbd.html", "booking.com"));
+    card.appendChild(affButton("Compare airlines (Aviasales)", "https://aviasales.tpm.li/GsTszCxG", "aviasales.com"));
+    if (cfg.exp) card.appendChild(affButton("Book experiences", "https://www.getyourguide.com/?partner_id=PNM6R9P&utm_medium=online_publisher", "getyourguide.com"));
 
     var note = document.createElement("p"); note.className = "rail-note";
     note.textContent = "We may earn a commission from bookings, at no extra cost to you.";
@@ -143,9 +154,46 @@
     window.addEventListener("pageshow", function () { bar.classList.remove("active"); bar.style.width = ""; });
   }
 
+  /* ---- Auto-inject brand icons into static .cta-aff links ---- */
+  // Maps a URL substring to the canonical domain for favicon lookup.
+  var AFF_DOMAIN_MAP = [
+    ["tkqlhce.com",      "booking.com"],   // CJ redirect → Booking
+    ["booking.com",      "booking.com"],
+    ["agoda.com",        "agoda.com"],
+    ["aviasales.",       "aviasales.com"],
+    ["kiwitaxi.",        "kiwitaxi.com"],
+    ["klook.",           "klook.com"],
+    ["wegotrip.",        "wegotrip.com"],
+    ["tiqets.",          "tiqets.com"],
+    ["radicalstorage.",  "radicalstorage.com"],
+    ["airalo.",          "airalo.com"],
+    ["safetywing.",      "safetywing.com"],
+    ["getyourguide.",    "getyourguide.com"]
+  ];
+  function injectAffIcons() {
+    var btns = document.querySelectorAll("a.cta-aff");
+    for (var i = 0; i < btns.length; i++) {
+      var a = btns[i];
+      if (a.querySelector(".aff-icon")) continue; // already injected by JS
+      var domain = null;
+      for (var j = 0; j < AFF_DOMAIN_MAP.length; j++) {
+        if (a.href.indexOf(AFF_DOMAIN_MAP[j][0]) !== -1) { domain = AFF_DOMAIN_MAP[j][1]; break; }
+      }
+      if (!domain) continue;
+      var img = document.createElement("img");
+      img.className = "aff-icon";
+      img.src = "https://www.google.com/s2/favicons?domain=" + domain + "&sz=32";
+      img.alt = "";
+      img.width = 18;
+      img.height = 18;
+      a.insertBefore(img, a.firstChild);
+    }
+  }
+
   ready(function () {
     mountRail();
     mountStickyPlan();
     mountProgress();
+    injectAffIcons();
   });
 })();

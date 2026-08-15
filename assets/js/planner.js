@@ -263,13 +263,39 @@
       airalo:   "Get online the minute you land"
     }[slug] || null;
   }
+  var AFF_ICON = {
+    booking:   "booking.com",
+    agoda:     "agoda.com",
+    flights:   "aviasales.com",
+    transfer:  "kiwitaxi.com",
+    klook:     "klook.com",
+    wegotrip:  "wegotrip.com",
+    tiqets:    "tiqets.com",
+    storage:   "radicalstorage.com",
+    airalo:    "airalo.com",
+    insurance: "safetywing.com"
+  };
   function ctaButton(slug) {
     var href = affLink(slug);
     if (!href) return null;
-    var a = el("a", "cta cta-aff", affLabel(slug));
+    var a = document.createElement("a");
+    a.className = "cta cta-aff";
     a.href = href;
     a.target = "_blank";
     a.rel = "sponsored noopener";
+    var domain = AFF_ICON[slug];
+    if (domain) {
+      var img = document.createElement("img");
+      img.className = "aff-icon";
+      img.src = "https://www.google.com/s2/favicons?domain=" + domain + "&sz=32";
+      img.alt = "";
+      img.width = 18;
+      img.height = 18;
+      a.appendChild(img);
+    }
+    var span = document.createElement("span");
+    span.textContent = affLabel(slug);
+    a.appendChild(span);
     return a;
   }
 
