@@ -74,6 +74,8 @@ a:hover { text-decoration-color: currentColor; }
 .muted { color: var(--ink-70); }
 .small-print { font-size: .82rem; color: var(--ink-70); margin: .8rem 0 0; }
 .aff-note { font-size: .78rem; color: var(--ink-70); margin: .25rem 0 .5rem; }
+.aff-link { color: var(--teal-600); font-weight: 600; text-decoration: none; border-bottom: 1.5px solid rgba(11,110,79,.3); transition: border-color .15s ease, color .15s ease; }
+.aff-link:hover { color: var(--teal); border-bottom-color: var(--teal); }
 .aff-inline { margin: .9rem 0 1.2rem; }
 .lead { font-size: 1.18rem; color: var(--ink-70); max-width: 60ch; }
 .text-link { display: inline-block; font-weight: 600; font-size: .95rem; margin-top: .4rem; }
