@@ -637,6 +637,99 @@ a:hover { text-decoration-color: currentColor; }
   .sp-grid { grid-template-columns: 1fr; }
 }
 
+/* ================================================================
+   BEAUTY OF BANGLADESH — photo gallery
+   ================================================================ */
+
+/* Hero band */
+.beauty-hero { background: var(--teal-600); color: #fff; padding: 3.5rem 0 3rem; text-align: center; }
+.beauty-hero h1 { font-size: clamp(2rem, 5vw, 3.4rem); color: #fff; margin-bottom: .6rem; }
+.beauty-hero .lead { font-size: 1.1rem; color: rgba(255,255,255,.85); max-width: 52ch; margin: 0 auto .8rem; }
+.beauty-hero-note { font-size: .82rem; color: rgba(255,255,255,.55); max-width: 44ch; margin: 0 auto; }
+.beauty-hero .eyebrow { color: var(--sand); }
+
+/* Masonry grid */
+.beauty-grid { columns: 3 280px; column-gap: 1rem; padding-top: 2.5rem; padding-bottom: 3.5rem; }
+
+/* Individual photo card */
+.beauty-card {
+  break-inside: avoid;
+  margin: 0 0 1rem;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--paper);
+}
+.beauty-card img {
+  width: 100%; display: block;
+  transition: transform .45s ease;
+}
+.beauty-card:hover img,
+.beauty-card:focus-within img { transform: scale(1.05); }
+
+/* Overlay caption */
+.beauty-cap {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: linear-gradient(to top, rgba(4,34,20,.92) 0%, rgba(4,34,20,.4) 60%, transparent 100%);
+  padding: 3.5rem 1.1rem 1.1rem;
+  color: #fff;
+  transform: translateY(calc(100% - 2.4rem));
+  transition: transform .32s ease;
+}
+.beauty-card:hover .beauty-cap,
+.beauty-card:focus-within .beauty-cap { transform: translateY(0); }
+.beauty-loc {
+  display: block;
+  font-family: var(--serif);
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: .35rem;
+  line-height: 1.2;
+}
+.beauty-desc {
+  display: block;
+  font-size: .82rem;
+  color: rgba(255,255,255,.82);
+  margin-bottom: .55rem;
+  line-height: 1.5;
+}
+.beauty-credit {
+  display: block;
+  font-size: .72rem;
+  color: rgba(255,255,255,.55);
+}
+.beauty-credit a { color: var(--sand); text-decoration: none; }
+.beauty-credit a:hover { text-decoration: underline; }
+
+/* Touch devices: always show caption (no hover state) */
+@media (hover: none) {
+  .beauty-cap { transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .beauty-card img { transition: none; }
+  .beauty-cap { transform: translateY(0); transition: none; }
+}
+
+/* Photographer submission */
+.beauty-submit { background: var(--cream); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 3rem 0; }
+.beauty-submit-inner { display: flex; gap: 3rem; align-items: flex-start; }
+.beauty-submit h2 { font-size: 1.4rem; margin-bottom: .6rem; }
+.beauty-submit .muted { color: var(--ink-70); font-size: .84rem; margin-top: .5rem; }
+.beauty-submit-cta { flex-shrink: 0; padding-top: .5rem; }
+.beauty-submit-btn { display: inline-block; white-space: nowrap; }
+.beauty-submit-cta .aff-note { font-size: .78rem; color: var(--ink-70); margin-top: .5rem; text-align: center; }
+@media (max-width: 640px) {
+  .beauty-submit-inner { flex-direction: column; gap: 1.5rem; }
+  .beauty-submit-cta { padding-top: 0; }
+}
+
+/* Soft plan CTA */
+.beauty-plan-cta { background: var(--paper); padding: 4rem 0; text-align: center; }
+.beauty-plan-inner h2 { font-size: clamp(1.5rem, 4vw, 2.2rem); margin-bottom: .5rem; }
+.beauty-plan-inner p { color: var(--ink-70); max-width: 44ch; margin: 0 auto 1.5rem; }
+.beauty-plan-btns { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; }
+
 /* ---- Custom cursors (last, so they beat per-component pointer rules;
         gated on no-preference for a clean reduced-motion fallback) ---- */
 @media (prefers-reduced-motion: no-preference) {
@@ -644,7 +737,7 @@ a:hover { text-decoration-color: currentColor; }
   a, button, summary, label,
   .card, .region-card, .crosslink, .cur-btn, .choice label,
   .cta, .cta-ghost, .nav-cta, .nav-toggle, .rail-book, .map-links a, .map-pin,
-  .sp-card, .sp-filter,
+  .sp-card, .sp-filter, .beauty-card,
   input[type=submit], [role=button] { cursor: url('/assets/img/cursor-pin.png') 14 14, pointer; }
   input, textarea, select { cursor: text; }
 }
