@@ -30,7 +30,7 @@
         <a href="regions/">Regions</a>
         <a href="cost-of-traveling-in-bangladesh.html">Costs</a>
         <a href="visa.html">Visa</a>
-        <a href="spots.html" aria-current="page">Spots</a><a href="about.html">About</a>
+        <a href="spots.html" aria-current="page">Spots</a><a href="beauty-of-bangladesh.html">Gallery</a><a href="about.html">About</a>
         <a class="nav-cta" href="plan.html">Plan my trip</a>
       </nav>
     </div>
@@ -47,15 +47,23 @@
       </div>
     </section>
 
-    <!-- Region filter pills -->
-    <div class="sp-filter-bar" role="group" aria-label="Filter by region">
-      <div class="wrap sp-filters" id="spFilters">
-        <button class="sp-filter is-active" data-region="all">All regions</button>
-        <button class="sp-filter" data-region="dhaka-gateway">🏙 Dhaka</button>
-        <button class="sp-filter" data-region="sundarbans">🌿 Sundarbans</button>
-        <button class="sp-filter" data-region="coxs-bazar">🏖 Cox's Bazar</button>
-        <button class="sp-filter" data-region="sylhet">🍵 Sylhet</button>
-        <button class="sp-filter" data-region="hill-tracts">⛰ Hill Tracts</button>
+    <!-- Region filter pills + pax stepper -->
+    <div class="sp-filter-bar">
+      <div class="wrap sp-filter-wrap">
+        <div class="sp-filters" id="spFilters" role="group" aria-label="Filter by region">
+          <button class="sp-filter is-active" data-region="all">All regions</button>
+          <button class="sp-filter" data-region="dhaka-gateway">🏙 Dhaka</button>
+          <button class="sp-filter" data-region="sundarbans">🌿 Sundarbans</button>
+          <button class="sp-filter" data-region="coxs-bazar">🏖 Cox's Bazar</button>
+          <button class="sp-filter" data-region="sylhet">🍵 Sylhet</button>
+          <button class="sp-filter" data-region="hill-tracts">⛰ Hill Tracts</button>
+        </div>
+        <div class="sp-pax-ctrl" aria-label="Number of travellers">
+          <span class="sp-pax-label">Travellers:</span>
+          <button class="pax-btn" id="sp-pax-dec" type="button" aria-label="Fewer travellers" disabled>−</button>
+          <span class="pax-count" id="sp-pax-count">1 traveller</span>
+          <button class="pax-btn" id="sp-pax-inc" type="button" aria-label="More travellers">+</button>
+        </div>
       </div>
     </div>
 
@@ -108,7 +116,7 @@
   <script>
   /* ======================================================================
      Spot Planner — client-side, no deps, URL-stateful
-     URL scheme: spots.html?s=lalbagh-fort,sadarghat,ratargul
+     URL scheme: spots.html?s=lalbagh-fort,sadarghat&pax=2&cur=GBP
      ====================================================================== */
   (function () {
     "use strict";
@@ -120,30 +128,51 @@
     /* ── State ─────────────────────────────────────────────────────── */
     var selected = {}; // id → spot object (with _region injected)
     var activeFilter = "all";
+    var pax = 1;
+    var cur = "USD";
 
     /* ── URL I/O ────────────────────────────────────────────────────── */
     function getParam(key) {
       return new URLSearchParams(window.location.search).get(key) || "";
     }
-    function setParam(key, val) {
+    function setAllParams() {
       var p = new URLSearchParams(window.location.search);
-      if (val) p.set(key, val); else p.delete(key);
+      var ids = Object.keys(selected);
+      if (ids.length) p.set("s", ids.join(","));
+      else p.delete("s");
+      if (pax > 1) p.set("pax", pax); else p.delete("pax");
+      if (cur && cur !== "USD") p.set("cur", cur); else p.delete("cur");
       var qs = p.toString();
       history.replaceState(null, "", window.location.pathname + (qs ? "?" + qs : ""));
     }
-    function saveState() {
-      var ids = Object.keys(selected);
-      setParam("s", ids.join(","));
-    }
     function loadState() {
-      var raw = getParam("s");
-      if (!raw) return;
-      var ids = raw.split(",").map(function (s) { return s.trim(); }).filter(Boolean);
-      ids.forEach(function (id) {
-        var spot = findSpot(id);
-        if (spot) selected[id] = spot;
-      });
+      var rawS = getParam("s");
+      if (rawS) {
+        rawS.split(",").map(function (s) { return s.trim(); }).filter(Boolean).forEach(function (id) {
+          var spot = findSpot(id);
+          if (spot) selected[id] = spot;
+        });
+      }
+      var rawPax = parseInt(getParam("pax"), 10);
+      if (!isNaN(rawPax) && rawPax >= 1) pax = Math.min(rawPax, 12);
+      var rawCur = (getParam("cur") || "USD").toUpperCase();
+      if (typeof FX !== "undefined" && FX[rawCur]) cur = rawCur;
     }
+
+    /* ── Currency helpers ───────────────────────────────────────────── */
+    function fmtUSD(n) {
+      if (typeof FX === "undefined" || !FX[cur]) return "$" + Math.round(n);
+      var fx = FX[cur];
+      var val = n * fx.rate;
+      var r;
+      if (val >= 10000) r = Math.round(val / 500) * 500;
+      else if (val >= 1000) r = Math.round(val / 50) * 50;
+      else if (val >= 100) r = Math.round(val / 10) * 10;
+      else if (val >= 20) r = Math.round(val / 5) * 5;
+      else r = Math.round(val);
+      return fx.symbol + r.toLocaleString("en-US");
+    }
+    function fmtRange(lo, hi) { return "≈ " + fmtUSD(lo) + "–" + fmtUSD(hi); }
 
     /* ── Spot lookup ────────────────────────────────────────────────── */
     function findSpot(id) {
@@ -162,12 +191,11 @@
       return null;
     }
 
-    /* ── Plan builder ───────────────────────────────────────────────── */
+    /* ── Plan builder (pax-aware) ───────────────────────────────────── */
     function buildPlan() {
       var ids = Object.keys(selected);
       if (!ids.length) return null;
 
-      /* Group: region → base → [spots] */
       var byRegion = {};
       ids.forEach(function (id) {
         var s = selected[id];
@@ -179,44 +207,59 @@
 
       var regionKeys = REGION_ORDER.filter(function (r) { return byRegion[r]; });
       var segments = [];
-      var totalDays = 0, totalNights = 0, budgetLow = 0, comfortHigh = 0;
+      var totalDays = 0, totalNights = 0;
+      var budgetTotal = 0, comfortTotal = 0;
 
       regionKeys.forEach(function (rk, ri) {
-        /* Inter-region transfer */
+        /* Inter-region transfer: PER_PERSON × pax (bus/train seats) */
         if (ri > 0) {
           var prevRk = regionKeys[ri - 1];
           var tr = INTER_REGION_COSTS[prevRk + ":" + rk] || INTER_REGION_COSTS[rk + ":" + prevRk];
           if (tr) {
-            segments.push({ type: "travel", label: tr.label, low: tr.cost[0], high: tr.cost[1] });
-            budgetLow   += tr.cost[0];
-            comfortHigh += tr.cost[1];
-            totalDays   += 1;
+            var trLow  = tr.cost[0] * pax;
+            var trHigh = tr.cost[1] * pax;
+            segments.push({ type: "travel", label: tr.label, low: trLow, high: trHigh, perPersonLow: tr.cost[0], perPersonHigh: tr.cost[1] });
+            budgetTotal  += trLow;
+            comfortTotal += trHigh;
+            totalDays    += 1;
           }
         }
 
         var bases = byRegion[rk];
         var baseKeys = Object.keys(bases);
         baseKeys.forEach(function (base, bi) {
-          /* Intra-region base-change transfer */
+          /* Intra-region base-change: PER_PERSON × pax */
           if (bi > 0) {
             var s0 = bases[base][0];
-            segments.push({ type: "base-change", label: "Transfer to " + base, note: s0.transfer.note, low: s0.transfer.cost[0], high: s0.transfer.cost[1] });
-            budgetLow   += s0.transfer.cost[0];
-            comfortHigh += s0.transfer.cost[1];
-            totalDays   += 0.5;
+            var bcLow  = s0.transfer.cost[0] * pax;
+            var bcHigh = s0.transfer.cost[1] * pax;
+            segments.push({ type: "base-change", label: "Transfer to " + base, note: s0.transfer.note, low: bcLow, high: bcHigh });
+            budgetTotal  += bcLow;
+            comfortTotal += bcHigh;
+            totalDays    += 0.5;
           }
 
           var bSpots = bases[base];
           var durSum  = bSpots.reduce(function (a, s) { return a + s.duration; }, 0);
           var days    = Math.ceil(durSum);
           var nights  = days;
+          var rooms   = Math.ceil(pax / 2); // ROOM_BASED: 2 travellers per room
           var hi      = SPOT_HOTEL_COSTS[base] || { budget: [15, 25], comfort: [55, 90] };
-          var hLow    = nights * hi.budget[0];
-          var hHigh   = nights * hi.comfort[1];
-          budgetLow   += hLow;
-          comfortHigh += hHigh;
-          totalDays   += days;
-          totalNights += nights;
+          /* Hotel: rooms × nights × per-room-rate */
+          var hLow    = nights * rooms * hi.budget[0];
+          var hHigh   = nights * rooms * hi.comfort[1];
+          budgetTotal  += hLow;
+          comfortTotal += hHigh;
+          totalDays    += days;
+          totalNights  += nights;
+
+          /* Spot-level transfers within this base: PER_PERSON × pax */
+          bSpots.forEach(function (sp) {
+            if (sp.transfer.cost[0] > 0) {
+              budgetTotal  += sp.transfer.cost[0] * pax;
+              comfortTotal += sp.transfer.cost[1] * pax;
+            }
+          });
 
           /* Build day slots */
           var slots = [], curSlot = [], curDur = 0;
@@ -230,11 +273,18 @@
           });
           if (curSlot.length) slots.push(curSlot);
 
-          segments.push({ type: "region", region: rk, base: base, spots: bSpots, days: days, nights: nights, hLow: hLow, hHigh: hHigh, hi: hi, slots: slots });
+          segments.push({ type: "region", region: rk, base: base, spots: bSpots, days: days, nights: nights, rooms: rooms, hLow: hLow, hHigh: hHigh, hi: hi, slots: slots });
         });
       });
 
-      return { segments: segments, totalDays: Math.ceil(totalDays), totalNights: totalNights, budgetLow: Math.round(budgetLow), comfortHigh: Math.round(comfortHigh), regionKeys: regionKeys };
+      var budgetPerPerson  = budgetTotal  / pax;
+      var comfortPerPerson = comfortTotal / pax;
+      return {
+        segments: segments, totalDays: Math.ceil(totalDays), totalNights: totalNights,
+        budgetTotal: Math.round(budgetTotal), comfortTotal: Math.round(comfortTotal),
+        budgetPerPerson: Math.round(budgetPerPerson), comfortPerPerson: Math.round(comfortPerPerson),
+        regionKeys: regionKeys, pax: pax
+      };
     }
 
     /* ── Render helpers ─────────────────────────────────────────────── */
@@ -244,7 +294,6 @@
       if (txt != null) n.textContent = txt;
       return n;
     }
-    function fmt(n) { return "$" + n; }
 
     /* ── Spot card render ───────────────────────────────────────────── */
     function renderCard(spot, rk) {
@@ -258,108 +307,78 @@
       card.setAttribute("aria-pressed", isSel ? "true" : "false");
       card.setAttribute("aria-label", spot.name + (isSel ? " (selected)" : ""));
 
-      /* Photo */
       var imgWrap = el("div", "sp-card-img");
       var img = document.createElement("img");
-      img.src     = spot.photo;
-      img.alt     = spot.name + ", Bangladesh";
-      img.loading = "lazy";
-      img.decoding = "async";
-      img.width   = 480;
-      img.height  = 320;
+      img.src = spot.photo; img.alt = spot.name + ", Bangladesh";
+      img.loading = "lazy"; img.decoding = "async";
+      img.width = 480; img.height = 320;
       imgWrap.appendChild(img);
-
-      /* Duration badge */
-      var dur = el("span", "sp-dur", DUR_LABEL[spot.duration] || spot.duration + "d");
-      imgWrap.appendChild(dur);
-
-      /* Check ring */
+      imgWrap.appendChild(el("span", "sp-dur", DUR_LABEL[spot.duration] || spot.duration + "d"));
       var ring = el("div", "sp-check-ring");
       ring.setAttribute("aria-hidden", "true");
       ring.innerHTML = '<svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
       imgWrap.appendChild(ring);
       card.appendChild(imgWrap);
 
-      /* Body */
       var body = el("div", "sp-card-body");
       body.appendChild(el("span", "sp-region-label", REGION_LABELS[rk]));
       body.appendChild(el("h3", "sp-name", spot.name));
       body.appendChild(el("p", "sp-desc", spot.desc));
-
-      /* Tags */
       if (spot.tags && spot.tags.length) {
         var tagRow = el("div", "sp-tags");
         spot.tags.forEach(function (t) { tagRow.appendChild(el("span", "sp-tag", t)); });
         body.appendChild(tagRow);
       }
-
-      /* Affiliate CTA (non-interactive on the card itself — just shows it) */
       if (spot.aff) {
         var affA = el("a", "cta-aff sp-aff", spot.aff.label);
-        affA.href   = spot.aff.url;
-        affA.target = "_blank";
-        affA.rel    = "sponsored noopener";
+        affA.href = spot.aff.url; affA.target = "_blank"; affA.rel = "sponsored noopener";
         affA.addEventListener("click", function (e) { e.stopPropagation(); });
         body.appendChild(affA);
       }
-
       card.appendChild(body);
 
-      /* Selection interaction */
       function toggle(e) {
         if (e.type === "keydown" && e.key !== "Enter" && e.key !== " ") return;
         if (e.type === "keydown") e.preventDefault();
-        /* Ignore click through to aff link */
         if (e.target && e.target.closest && e.target.closest("a")) return;
-        if (selected[spot.id]) {
-          delete selected[spot.id];
-        } else {
-          var copy = {};
-          for (var k in spot) copy[k] = spot[k];
-          copy._region = rk;
-          selected[spot.id] = copy;
-        }
-        saveState();
+        if (selected[spot.id]) { delete selected[spot.id]; }
+        else { var copy = {}; for (var k in spot) copy[k] = spot[k]; copy._region = rk; selected[spot.id] = copy; }
+        setAllParams();
         refreshCard(card, spot.id);
         renderPanel();
       }
       card.addEventListener("click",   toggle);
       card.addEventListener("keydown", toggle);
-
       return card;
     }
 
     function refreshCard(card, id) {
       var isSel = !!selected[id];
-      card.className   = "sp-card" + (isSel ? " is-selected" : "");
+      card.className = "sp-card" + (isSel ? " is-selected" : "");
       card.setAttribute("aria-pressed", isSel ? "true" : "false");
     }
 
     /* ── Plan panel render ──────────────────────────────────────────── */
     function renderPanel() {
       var empty = document.getElementById("spEmpty");
-      var plan  = document.getElementById("spPlan");
+      var planEl = document.getElementById("spPlan");
       var p     = buildPlan();
 
       if (!p) {
-        empty.hidden = false;
-        plan.hidden  = true;
-        plan.innerHTML = "";
+        empty.hidden = false; planEl.hidden = true; planEl.innerHTML = "";
         return;
       }
-      empty.hidden = true;
-      plan.hidden  = false;
-      plan.innerHTML = "";
+      empty.hidden = true; planEl.hidden = false; planEl.innerHTML = "";
+
+      var paxLabel = pax === 1 ? "1 traveller" : pax + " travellers";
 
       /* Header */
       var hdr = el("div", "sp-plan-hdr");
       hdr.appendChild(el("h3", null, "Your plan"));
-
-      /* Stats row */
       var stats = el("div", "sp-plan-stats");
       function stat(num, lbl) {
         var s = el("div", "sp-plan-stat");
-        s.appendChild(el("span", "sp-stat-num", num));
+        s.appendChild(el("span", "sp-stat-num", String(num)));
         s.appendChild(el("span", "sp-stat-lbl", lbl));
         return s;
       }
@@ -367,34 +386,48 @@
       stats.appendChild(stat(p.totalDays, "days"));
       stats.appendChild(stat(p.totalNights, "nights"));
       hdr.appendChild(stats);
-      plan.appendChild(hdr);
+      planEl.appendChild(hdr);
 
       /* Cost summary */
       var costBox = el("div", "sp-plan-cost");
+      /* Total for N travellers */
+      var cr0 = el("div", "sp-cost-row sp-cost-pax-hd");
+      cr0.innerHTML = "<span>For " + paxLabel + "</span>";
+      costBox.appendChild(cr0);
       var cr1 = el("div", "sp-cost-row");
-      cr1.innerHTML = "<span>Budget estimate</span><span class='sp-cost-val'>" + fmt(p.budgetLow) + " <small>/ person</small></span>";
+      cr1.innerHTML = "<span>Budget estimate</span><span class='sp-cost-val'>" + fmtUSD(p.budgetTotal) + "</span>";
       var cr2 = el("div", "sp-cost-row sp-cost-comfort");
-      cr2.innerHTML = "<span>Comfort estimate</span><span class='sp-cost-val'>" + fmt(p.comfortHigh) + " <small>/ person</small></span>";
-      var cn = el("p", "sp-cost-note", "Hotel + transfers + entry fees. Flights not included. Prices are per person.");
+      cr2.innerHTML = "<span>Comfort estimate</span><span class='sp-cost-val'>" + fmtUSD(p.comfortTotal) + "</span>";
       costBox.appendChild(cr1);
       costBox.appendChild(cr2);
-      costBox.appendChild(cn);
-      plan.appendChild(costBox);
 
-      /* Day-by-day breakdown */
+      /* Per person (if pax > 1) */
+      if (pax > 1) {
+        var crPP = el("div", "sp-cost-row sp-cost-pp");
+        crPP.innerHTML = "<span>≈ per person</span><span class='sp-cost-val'>" + fmtUSD(p.budgetPerPerson) + "–" + fmtUSD(p.comfortPerPerson) + "</span>";
+        costBox.appendChild(crPP);
+      }
+
+      var cn = el("p", "sp-cost-note",
+        "Hotel (" + Math.ceil(pax / 2) + " room" + (Math.ceil(pax / 2) > 1 ? "s" : "") + ") + transfers + entry fees. Flights not included. Approx.");
+      costBox.appendChild(cn);
+      planEl.appendChild(costBox);
+
+      /* Day-by-day */
       var dayCount = 0;
       var daySection = el("div", "sp-day-section");
-      var dayHd = el("p", "sp-section-hd", "Day-by-day");
-      daySection.appendChild(dayHd);
+      daySection.appendChild(el("p", "sp-section-hd", "Day-by-day"));
 
       p.segments.forEach(function (seg) {
         if (seg.type === "travel" || seg.type === "base-change") {
           var tr = el("div", "sp-plan-transfer");
-          tr.innerHTML = "✈ " + seg.label + (seg.note ? " <span class='sp-tr-note'>(" + seg.note + ")</span>" : "") + " — approx " + fmt(seg.low) + "–" + fmt(seg.high);
+          tr.innerHTML = "✈ " + seg.label +
+            (seg.note ? " <span class='sp-tr-note'>(" + seg.note + ")</span>" : "") +
+            " — " + fmtRange(seg.low, seg.high) +
+            (pax > 1 ? " (" + fmtUSD(seg.low / pax) + " pp)" : "");
           daySection.appendChild(tr);
           return;
         }
-        /* Region segment */
         seg.slots.forEach(function (slotSpots, si) {
           dayCount++;
           var isLast = (si === seg.slots.length - 1) && (p.regionKeys[p.regionKeys.length - 1] === seg.region);
@@ -403,11 +436,12 @@
           dayEl.appendChild(el("div", "sp-day-hd", lbl));
           var bd = el("div", "sp-day-bd");
           if (isLast) {
-            bd.appendChild(el("p", "sp-day-dep", "Head to the airport — no new sightseeing on departure day."));
+            bd.appendChild(el("p", "sp-day-dep", "Head to the airport — no new sightseeing on departure day. Return to Dhaka for international flights."));
           } else {
             slotSpots.forEach(function (sp) {
               var row = el("div", "sp-day-spot");
-              row.innerHTML = "<span class='sp-dot'>·</span><span>" + sp.name + " <span class='sp-dur-inline'>(" + (DUR_LABEL[sp.duration] || sp.duration + "d") + ")</span></span>";
+              row.innerHTML = "<span class='sp-dot'>·</span><span>" + sp.name +
+                " <span class='sp-dur-inline'>(" + (DUR_LABEL[sp.duration] || sp.duration + "d") + ")</span></span>";
               bd.appendChild(row);
             });
           }
@@ -415,52 +449,44 @@
           daySection.appendChild(dayEl);
         });
       });
-      plan.appendChild(daySection);
+      planEl.appendChild(daySection);
 
       /* Hotels needed */
       var hotelSec = el("div", "sp-hotel-section");
-      var hotelHd = el("p", "sp-section-hd", "Hotels needed");
-      hotelSec.appendChild(hotelHd);
+      hotelSec.appendChild(el("p", "sp-section-hd", "Hotels needed"));
       p.segments.forEach(function (seg) {
         if (seg.type !== "region") return;
         var row = el("div", "sp-hotel-row");
-        var lbl = el("span", null, seg.base + " · " + seg.nights + " night" + (seg.nights === 1 ? "" : "s"));
+        var rooms = seg.rooms;
+        var lbl = el("span", null, seg.base + " · " + rooms + " room" + (rooms === 1 ? "" : "s") + " · " + seg.nights + " night" + (seg.nights === 1 ? "" : "s"));
         var bookA = el("a", "cta-aff sp-hotel-btn", "Find hotels");
-        bookA.href   = "https://www.tkqlhce.com/click-101858699-17293139?url=https%3A%2F%2Fwww.booking.com%2Fcountry%2Fbd.html";
-        bookA.target = "_blank";
-        bookA.rel    = "sponsored noopener";
-        row.appendChild(lbl);
-        row.appendChild(bookA);
+        bookA.href = "https://www.tkqlhce.com/click-101858699-17293139?url=https%3A%2F%2Fwww.booking.com%2Fcountry%2Fbd.html";
+        bookA.target = "_blank"; bookA.rel = "sponsored noopener";
+        row.appendChild(lbl); row.appendChild(bookA);
         hotelSec.appendChild(row);
       });
-      plan.appendChild(hotelSec);
+      planEl.appendChild(hotelSec);
 
       /* Actions */
       var actSec = el("div", "sp-plan-actions");
-
-      /* Build full itinerary link */
       var planRegions = p.regionKeys.map(function (r) { return REGION_PLAN_SLUG[r] || r; }).join(",");
       var planDays    = Math.max(p.totalDays, 3);
-      var planUrl     = "plan.html?regions=" + planRegions + "&days=" + planDays + "&style=comfort";
-      var planA       = el("a", "cta sp-plan-full", "Build full itinerary →");
+      var planUrl     = "plan.html?regions=" + planRegions + "&days=" + planDays + "&style=comfort&pax=" + pax + (cur !== "USD" ? "&cur=" + cur : "");
+      var planA = el("a", "cta sp-plan-full", "Build full itinerary →");
       planA.href = planUrl;
       actSec.appendChild(planA);
 
-      /* Share */
       var shareBtn = el("button", "cta-ghost sp-share-btn", "Copy plan link");
       shareBtn.addEventListener("click", function () {
         navigator.clipboard.writeText(window.location.href).then(function () {
           shareBtn.textContent = "Copied! ✓";
           setTimeout(function () { shareBtn.textContent = "Copy plan link"; }, 2000);
-        }).catch(function () {
-          shareBtn.textContent = window.location.href;
-        });
+        }).catch(function () { shareBtn.textContent = window.location.href; });
       });
       actSec.appendChild(shareBtn);
-      plan.appendChild(actSec);
+      planEl.appendChild(actSec);
 
-      /* Disclosure */
-      plan.appendChild(el("p", "sp-plan-disclosure", "We earn a small commission from bookings through our links, at no extra cost to you."));
+      planEl.appendChild(el("p", "sp-plan-disclosure", "We earn a small commission from bookings through our links, at no extra cost to you."));
     }
 
     /* ── Grid render ────────────────────────────────────────────────── */
@@ -468,8 +494,7 @@
       var grid = document.getElementById("spGrid");
       grid.innerHTML = "";
       REGION_ORDER.forEach(function (rk) {
-        var arr = SPOTS[rk] || [];
-        arr.forEach(function (spot) {
+        (SPOTS[rk] || []).forEach(function (spot) {
           var card = renderCard(spot, rk);
           if (activeFilter !== "all" && rk !== activeFilter) card.hidden = true;
           grid.appendChild(card);
@@ -480,13 +505,11 @@
     /* ── Filter ─────────────────────────────────────────────────────── */
     function applyFilter(region) {
       activeFilter = region;
-      var cards = document.querySelectorAll(".sp-card");
-      var filters = document.querySelectorAll(".sp-filter");
-      filters.forEach(function (f) {
-        f.classList.toggle("is-active", f.dataset.region === region);
-      });
-      cards.forEach(function (c) {
+      document.querySelectorAll(".sp-card").forEach(function (c) {
         c.hidden = (region !== "all" && c.dataset.region !== region);
+      });
+      document.querySelectorAll(".sp-filter").forEach(function (f) {
+        f.classList.toggle("is-active", f.dataset.region === region);
       });
     }
 
@@ -496,15 +519,31 @@
       applyFilter(btn.dataset.region);
     });
 
+    /* ── Pax stepper (in hero or filter bar) ───────────────────────── */
+    function updatePaxDisplay() {
+      var paxCount = document.getElementById("sp-pax-count");
+      if (paxCount) paxCount.textContent = pax === 1 ? "1 traveller" : pax + " travellers";
+      var dec = document.getElementById("sp-pax-dec");
+      var inc = document.getElementById("sp-pax-inc");
+      if (dec) dec.disabled = pax <= 1;
+      if (inc) inc.disabled = pax >= 12;
+    }
+    var paxDecEl = document.getElementById("sp-pax-dec");
+    var paxIncEl = document.getElementById("sp-pax-inc");
+    if (paxDecEl) paxDecEl.addEventListener("click", function () {
+      if (pax > 1) { pax--; updatePaxDisplay(); setAllParams(); renderPanel(); }
+    });
+    if (paxIncEl) paxIncEl.addEventListener("click", function () {
+      if (pax < 12) { pax++; updatePaxDisplay(); setAllParams(); renderPanel(); }
+    });
+
     /* ── Bootstrap ──────────────────────────────────────────────────── */
     loadState();
-
-    /* If ?region= filter pre-set (e.g. from a region page CTA) */
     var preFilter = getParam("region");
     if (preFilter && REGION_ORDER.indexOf(preFilter) >= 0) activeFilter = preFilter;
-
     renderGrid();
     if (activeFilter !== "all") applyFilter(activeFilter);
+    updatePaxDisplay();
     renderPanel();
 
   })();

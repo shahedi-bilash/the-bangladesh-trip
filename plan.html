@@ -106,6 +106,18 @@
             </div>
           </div>
 
+          <!-- Travellers (pax) -->
+          <div class="field">
+            <span class="field-label">How many travellers?</span>
+            <p class="field-help">Affects hotel rooms (2 per room), seats and total cost. Per-person breakdown also shown.</p>
+            <div class="pax-row">
+              <button type="button" class="pax-btn" id="pax-dec" aria-label="Fewer travellers" disabled>−</button>
+              <span class="pax-count" id="pax-count">1 traveller</span>
+              <button type="button" class="pax-btn" id="pax-inc" aria-label="More travellers">+</button>
+              <input type="hidden" id="f-pax" name="pax" value="1">
+            </div>
+          </div>
+
           <!-- From + Month -->
           <div class="field">
             <div class="two-col">

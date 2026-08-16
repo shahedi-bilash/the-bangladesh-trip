@@ -638,6 +638,41 @@ a:hover { text-decoration-color: currentColor; }
 }
 
 /* ================================================================
+   PAX STEPPER — shared between planner and spot planner
+   ================================================================ */
+.pax-row { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
+.pax-btn {
+  width: 2.1rem; height: 2.1rem; border-radius: 50%;
+  border: 2px solid var(--teal); background: transparent; color: var(--teal);
+  font-size: 1.25rem; line-height: 1; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s, color .15s;
+}
+.pax-btn:hover:not(:disabled) { background: var(--teal); color: #fff; }
+.pax-btn:disabled { opacity: .35; cursor: default; }
+.pax-count { font-size: 1rem; font-weight: 600; min-width: 8ch; text-align: center; }
+
+/* Per-person breakdown on cost card */
+.cost-key-wrap { display: flex; flex-direction: column; gap: .05rem; }
+.cost-subkey { font-size: .75rem; color: var(--ink-70); font-style: italic; }
+.cost-per-person .cost-key { color: var(--ink-70); font-weight: 500; font-style: italic; }
+.cost-per-person .cost-val { color: var(--ink-70); font-style: italic; }
+.cur-auto-note { font-size: .78rem; color: var(--ink-70); margin-bottom: .75rem; }
+.cur-auto-chip { display: inline-block; font-size: .78rem; background: var(--teal); color: #fff; border-radius: 999px; padding: .15rem .6rem; margin-left: .35rem; vertical-align: middle; }
+
+/* Spot planner pax row in filter bar */
+.sp-filter-wrap { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .5rem; }
+.sp-filters { display: flex; flex-wrap: wrap; gap: .4rem; }
+.sp-pax-ctrl { display: flex; align-items: center; gap: .5rem; flex-shrink: 0; }
+.sp-pax-label { font-size: .82rem; color: var(--ink-70); white-space: nowrap; }
+.sp-pax-ctrl .pax-btn { width: 1.7rem; height: 1.7rem; font-size: 1rem; }
+.sp-pax-ctrl .pax-count { font-size: .9rem; min-width: 7ch; }
+/* Spot plan pax total heading */
+.sp-cost-pax-hd { font-size: .82rem; font-weight: 600; color: var(--ink-70); padding-bottom: .25rem; border-bottom: 1px solid var(--line); margin-bottom: .25rem; }
+.sp-cost-pp { color: var(--ink-70); font-size: .88rem; border-top: 1px solid var(--line); margin-top: .25rem; padding-top: .25rem; }
+.sp-cost-pp .sp-cost-val { color: var(--ink-70); }
+
+/* ================================================================
    BEAUTY OF BANGLADESH — photo gallery
    ================================================================ */
 
@@ -737,7 +772,7 @@ a:hover { text-decoration-color: currentColor; }
   a, button, summary, label,
   .card, .region-card, .crosslink, .cur-btn, .choice label,
   .cta, .cta-ghost, .nav-cta, .nav-toggle, .rail-book, .map-links a, .map-pin,
-  .sp-card, .sp-filter, .beauty-card,
+  .sp-card, .sp-filter, .beauty-card, .pax-btn,
   input[type=submit], [role=button] { cursor: url('/assets/img/cursor-pin.png') 14 14, pointer; }
   input, textarea, select { cursor: text; }
 }

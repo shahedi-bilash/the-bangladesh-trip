@@ -4,7 +4,7 @@
    State lives entirely in the URL, so every plan is shareable and
    regenerates with no backend:
      plan.html?regions=dhaka,sundarbans&days=7&style=comfort
-               &from=United%20States&month=Dec&cur=USD
+               &from=United%20States&month=Dec&cur=USD&pax=2
    This file: reads those params, drives the input form, computes an
    honest cost range, stitches a day-by-day skeleton, resolves the visa
    summary, and builds the share bar. Pure vanilla JS.
@@ -26,6 +26,9 @@
   }
   function clamp(n, lo, hi) { return Math.max(lo, Math.min(hi, n)); }
 
+  /* Track whether the user has manually clicked a currency button this session. */
+  var _userPickedCur = false;
+
   function getParams() {
     var p = new URLSearchParams(window.location.search);
     var regions = (p.get("regions") || "").split(",").map(function (s) { return s.trim(); }).filter(Boolean);
@@ -34,12 +37,16 @@
     var days = parseInt(p.get("days"), 10);
     if (isNaN(days)) days = 0;
     days = clamp(days, 0, 60);
+    var pax = parseInt(p.get("pax"), 10);
+    if (isNaN(pax) || pax < 1) pax = 1;
+    pax = clamp(pax, 1, 12);
     var cur = (p.get("cur") || "USD").toUpperCase();
     if (!FX[cur]) cur = "USD";
     return {
       regions: regions,
       days: days,
       style: style,
+      pax: pax,
       from: p.get("from") || "",
       month: p.get("month") || "",
       cur: cur
@@ -57,9 +64,10 @@
     return [rangeUSD[0] * fx.rate, rangeUSD[1] * fx.rate];
   }
   function roundNice(v) {
-    if (v >= 1000) return Math.round(v / 50) * 50;
-    if (v >= 100) return Math.round(v / 10) * 10;
-    if (v >= 20) return Math.round(v / 5) * 5;
+    if (v >= 10000) return Math.round(v / 500) * 500;
+    if (v >= 1000)  return Math.round(v / 50) * 50;
+    if (v >= 100)   return Math.round(v / 10) * 10;
+    if (v >= 20)    return Math.round(v / 5) * 5;
     return Math.round(v);
   }
   function fmtMoney(v, cur) {
@@ -97,11 +105,9 @@
     var c = findCountry(country);
     if (c) {
       var v = c.visa;
-      // Find matching VISA group for the rich note text
       for (var k = 0; k < VISA.length; k++) {
         if (VISA[k].summary === v) return VISA[k];
       }
-      // Fallback notes when group not in legacy VISA array
       if (v === "visa_on_arrival") return { group: "Visa on arrival", summary: "visa_on_arrival",
         note: "Your nationality may qualify for a visa on arrival at Dhaka airport. Conditions and eligibility change — always confirm with an official Bangladesh mission before you fly." };
       if (v === "e_visa") return { group: "e-Visa", summary: "e_visa",
@@ -109,7 +115,6 @@
       return { group: "Apply in advance", summary: "embassy",
         note: "Travellers from " + country + " should arrange a visa before arrival through a Bangladesh embassy, consulate or e-visa portal." };
     }
-    // Legacy VISA array fallback
     var lc = country.trim().toLowerCase();
     for (var i = 0; i < VISA.length; i++) {
       var g = VISA[i];
@@ -126,46 +131,66 @@
     return "Apply in advance (e-visa / embassy)";
   }
 
-  /* ---------- cost model ---------- */
+  /* ---------- cost model — pax-aware ----------
+     Cost types:
+       PER_PERSON : × pax               (food, eSIM, insurance, intercity seats, activities)
+       ROOM_BASED : ceil(pax/2) rooms   (hotels — 2 travellers share a room)
+       SHARED     : flat per trip       (nothing here at region level — spot planner handles private boats)
+  ---------------------------------------------------------------- */
   function computeCost(params) {
     var style = params.style;
-    var days = params.days;
+    var days  = params.days;
+    var pax   = params.pax || 1;
     var regions = params.regions.map(regionById).filter(Boolean);
     var nRegions = Math.max(regions.length, 1);
-    var nights = Math.max(days - 1, 1); // last day you fly out
+    var nights = Math.max(days - 1, 1); // last day = departure, no hotel
+    var rooms  = Math.ceil(pax / 2);    // standard double-occupancy
 
-    // Region day-rates cover local transport + activities baseline per day.
-    // We average the selected regions' per-day rate, then multiply by days.
+    /* Region day-rates: local transport + activities, PER PERSON per day */
     var perDay = [0, 0];
     regions.forEach(function (r) { perDay = addR(perDay, r.perDayUSD[style]); });
     perDay = scaleR(perDay, 1 / nRegions);
-    var regionDays = scaleR(perDay, Math.max(days, 1));
+    var regionDays = scaleR(perDay, Math.max(days, 1) * pax);
 
-    // Hotels, food, intercity, eSIM, insurance.
-    var hotels = scaleR(COST.hotelNightUSD[style], nights);
-    var food = scaleR(COST.foodDayUSD[style], Math.max(days, 1));
-    // Intercity scales with how many regions you're hopping between.
-    var intercity = scaleR(COST.intercityUSD[style], clamp(nRegions, 1, 5) * 0.6 + 0.4);
-    var esim = COST.esimUSD.slice();
-    var insurance = scaleR(COST.insuranceWeekUSD, Math.max(days / 7, 0.5));
+    /* Hotels: ROOM_BASED — ceil(pax/2) rooms × nights */
+    var hotels = scaleR(COST.hotelNightUSD[style], rooms * nights);
 
-    // Named experiences (one signature experience budgeted per region).
-    var experiences = scaleR([12, 45], nRegions); // indicative, style-agnostic entry/permits
-    if (style === "premium") experiences = scaleR(experiences, 1.8);
+    /* Experiences & entry permits: PER_PERSON */
+    var experiences = scaleR([12, 45], nRegions * pax);
+    if (style === "premium")    experiences = scaleR(experiences, 1.8);
     if (style === "backpacker") experiences = scaleR(experiences, 0.6);
 
+    /* Food: PER_PERSON per day */
+    var food = scaleR(COST.foodDayUSD[style], Math.max(days, 1) * pax);
+
+    /* Intercity: PER_PERSON (bus/train seats) */
+    var intercityBase = scaleR(COST.intercityUSD[style], clamp(nRegions, 1, 5) * 0.6 + 0.4);
+    var intercity = scaleR(intercityBase, pax);
+
+    /* eSIM: PER_PERSON */
+    var esim = scaleR(COST.esimUSD.slice(), pax);
+
+    /* Insurance: PER_PERSON per week */
+    var insurance = scaleR(COST.insuranceWeekUSD, Math.max(days / 7, 0.5) * pax);
+
+    var roomNote = rooms > 1
+      ? rooms + " rooms (" + pax + " travellers, 2 per room)"
+      : nights + " night" + (nights === 1 ? "" : "s");
+
     var lines = [
-      { key: "Local days (transport + activities)", range: regionDays },
-      { key: "Hotels · " + nights + " night" + (nights === 1 ? "" : "s"), range: hotels },
-      { key: "Experiences & permits", range: experiences },
+      { key: "Local days (transport + activities)",                  range: regionDays },
+      { key: "Hotels · " + rooms + " room" + (rooms === 1 ? "" : "s") + " · " + nights + " night" + (nights === 1 ? "" : "s"),
+        subkey: roomNote, range: hotels },
+      { key: "Experiences & permits",                               range: experiences },
       { key: "Food · " + Math.max(days, 1) + " day" + (days === 1 ? "" : "s"), range: food },
-      { key: "Intercity travel", range: intercity },
-      { key: "Tourist eSIM", range: esim },
-      { key: "Travel insurance", range: insurance }
+      { key: "Intercity travel",                                    range: intercity },
+      { key: "Tourist eSIM" + (pax > 1 ? " · " + pax + " SIMs" : ""), range: esim },
+      { key: "Travel insurance",                                    range: insurance }
     ];
     var total = [0, 0];
     lines.forEach(function (l) { total = addR(total, l.range); });
-    return { lines: lines, total: total, nights: nights };
+    var perPerson = scaleR(total, 1 / pax);
+    return { lines: lines, total: total, perPerson: perPerson, nights: nights, rooms: rooms, pax: pax };
   }
 
   /* ---------- day-by-day skeleton ---------- */
@@ -174,14 +199,11 @@
     var days = params.days;
     if (!regions.length || !days) return [];
 
-    // Distribute days across regions, respecting each region's minDays
-    // as a soft floor, proportionally otherwise.
     var weights = regions.map(function (r) { return r.minDays; });
     var wSum = weights.reduce(function (a, b) { return a + b; }, 0);
     var alloc = regions.map(function (r, i) {
       return Math.max(1, Math.round(days * (weights[i] / wSum)));
     });
-    // Fix rounding drift to match the requested day count.
     var diff = days - alloc.reduce(function (a, b) { return a + b; }, 0);
     var idx = 0;
     while (diff !== 0 && regions.length) {
@@ -189,7 +211,7 @@
       if (alloc[idx % regions.length] < 1) alloc[idx % regions.length] = 1;
       diff = days - alloc.reduce(function (a, b) { return a + b; }, 0);
       idx++;
-      if (idx > 500) break; // safety
+      if (idx > 500) break;
     }
 
     var plan = [];
@@ -199,25 +221,16 @@
       for (var d = 0; d < n; d++) {
         var tmpl = r.dayTemplates[d % r.dayTemplates.length];
         var title = tmpl.title;
-        // Vary repeated titles so days don't read identically.
         if (d >= r.dayTemplates.length) title += " · more time";
-        plan.push({
-          day: dayNo++,
-          region: r.name,
-          title: title,
-          detail: tmpl.detail
-        });
+        plan.push({ day: dayNo++, region: r.name, title: title, detail: tmpl.detail });
       }
     });
 
-    // Replace the last day with a departure note — never schedule sightseeing
-    // on flight day. If not ending in Dhaka, prompt travellers to return early.
+    /* Last day = departure — no sightseeing on flight day */
     if (plan.length > 0) {
       var last = plan[plan.length - 1];
       var leavingFromDhaka = last.region === "Dhaka Gateway";
-      last.title = leavingFromDhaka
-        ? "Fly home from Dhaka"
-        : "Return to Dhaka — fly home";
+      last.title = leavingFromDhaka ? "Fly home from Dhaka" : "Return to Dhaka — fly home";
       last.detail = leavingFromDhaka
         ? "Head to Hazrat Shahjalal International Airport (DAC). Allow extra time for Dhaka traffic — no new sightseeing on departure day."
         : "Travel back to Dhaka today so you're not rushing on flight day. International flights leave from Hazrat Shahjalal (DAC) — aim to arrive in the city the evening before. No new sightseeing on departure day.";
@@ -231,8 +244,6 @@
     if (!slug || !AFF_BASE[slug]) return null;
     var base = AFF_BASE[slug];
     var id = AFF[slug];
-    // Real programs use their own param names; this is a safe generic tag
-    // that the owner swaps for the correct tracking parameter later.
     if (id && id !== "TODO") {
       base += (base.indexOf("?") === -1 ? "?" : "&") + "aff=" + encodeURIComponent(id);
     }
@@ -312,72 +323,106 @@
     }
 
     var cur = params.cur;
+    var pax = params.pax || 1;
     var styleName = params.style.charAt(0).toUpperCase() + params.style.slice(1);
 
     /* Summary header */
     var head = el("div", "result-head");
     head.appendChild(el("p", "eyebrow", "Your Bangladesh plan"));
-    var h = el("h2", null, regions.map(function (r) { return r.name; }).join(" · "));
-    head.appendChild(h);
-    var meta = el("p", "result-meta",
-      params.days + " days · " + styleName + " style" +
+    head.appendChild(el("h2", null, regions.map(function (r) { return r.name; }).join(" · ")));
+    var paxLabel = pax === 1 ? "1 traveller" : pax + " travellers";
+    head.appendChild(el("p", "result-meta",
+      params.days + " days · " + paxLabel + " · " + styleName + " style" +
       (params.from ? " · from " + params.from : "") +
-      (params.month ? " · " + params.month : ""));
-    head.appendChild(meta);
+      (params.month ? " · " + params.month : "")));
     root.appendChild(head);
 
     /* Cost card */
     var cost = computeCost(params);
     var costCard = el("section", "card cost-card");
-    costCard.appendChild(el("h3", "card-title", "Estimated cost"));
+
+    var costTitle = el("h3", "card-title", "Estimated cost");
+    costCard.appendChild(costTitle);
+
+    /* Currency note for hidden/auto-switched currencies */
+    var curFx = FX[cur] || FX.USD;
+    if (curFx.hidden) {
+      var curNote = el("p", "cur-auto-note", "Showing in " + curFx.label + " (approx.) · " + curFx.symbol + "1 ≈ $" + (1 / curFx.rate).toFixed(3));
+      costCard.appendChild(curNote);
+    }
+
     var table = el("div", "cost-lines");
     cost.lines.forEach(function (l) {
       var row = el("div", "cost-row");
-      row.appendChild(el("span", "cost-key", l.key));
+      var keyWrap = el("div", "cost-key-wrap");
+      keyWrap.appendChild(el("span", "cost-key", l.key));
+      if (l.subkey) keyWrap.appendChild(el("span", "cost-subkey", l.subkey));
+      row.appendChild(keyWrap);
       row.appendChild(el("span", "cost-val", fmtRange(l.range, cur)));
       table.appendChild(row);
-      // Inline Airalo CTA below the eSIM line
+      /* Inline Airalo CTA below the eSIM line */
       if (l.key.indexOf("eSIM") !== -1) {
         var esimBtn = ctaButton("airalo");
         if (esimBtn) { esimBtn.style.fontSize = ".8rem"; esimBtn.style.marginTop = ".25rem"; table.appendChild(esimBtn); }
         table.appendChild(el("p", "aff-note", "Get online the minute you land"));
       }
     });
+
+    /* Total + per-person rows */
     var totalRow = el("div", "cost-row cost-total");
-    totalRow.appendChild(el("span", "cost-key", "Estimated total, per person"));
+    var totalKeyWrap = el("div", "cost-key-wrap");
+    totalKeyWrap.appendChild(el("span", "cost-key", "Total for " + paxLabel));
+    totalRow.appendChild(totalKeyWrap);
     totalRow.appendChild(el("span", "cost-val", fmtRange(cost.total, cur)));
     table.appendChild(totalRow);
+
+    if (pax > 1) {
+      var ppRow = el("div", "cost-row cost-per-person");
+      ppRow.appendChild(el("span", "cost-key", "≈ per person"));
+      ppRow.appendChild(el("span", "cost-val", fmtRange(cost.perPerson, cur)));
+      table.appendChild(ppRow);
+    }
+
     costCard.appendChild(table);
     costCard.appendChild(el("p", "small-print",
-      "Indicative estimate only — real cost varies with season, operator, group size and how you travel. Currency shown is approximate. Excludes international flights to and from Bangladesh."));
+      "Indicative estimate only — real cost varies with season, operator, group size and how you travel. " +
+      "Currency conversions are approximate. Hotels estimated at " + cost.rooms + " room" +
+      (cost.rooms === 1 ? "" : "s") + " (2 per room). Excludes international flights."));
     var flightsBtn = ctaButton("flights");
     if (flightsBtn) { flightsBtn.classList.add("cta-block"); costCard.appendChild(flightsBtn); }
-    var flightsNote = el("p", "aff-note", "Compare airlines in one search");
-    costCard.appendChild(flightsNote);
-    // Currency switcher
+    costCard.appendChild(el("p", "aff-note", "Compare airlines in one search"));
+
+    /* Currency switcher — only non-hidden currencies as buttons */
     var curWrap = el("div", "cur-switch");
     curWrap.appendChild(el("span", "cur-label", "Show in:"));
     Object.keys(FX).forEach(function (code) {
+      if (FX[code].hidden) return; // don't show hidden currencies as buttons
       var b = el("button", "cur-btn" + (code === cur ? " is-active" : ""), code);
       b.type = "button";
       b.addEventListener("click", function () {
-        var p = new URLSearchParams(window.location.search);
-        p.set("cur", code);
-        history.replaceState(null, "", "plan.html?" + p.toString());
+        _userPickedCur = true;
+        var p2 = new URLSearchParams(window.location.search);
+        p2.set("cur", code);
+        history.replaceState(null, "", "plan.html?" + p2.toString());
         renderResult(getParams());
       });
       curWrap.appendChild(b);
     });
+    /* If cur is a hidden currency (auto-selected), show it as a label, not a button */
+    if (curFx.hidden) {
+      var hiddenLabel = el("span", "cur-auto-chip", curFx.label + " (auto)");
+      curWrap.appendChild(hiddenLabel);
+    }
     costCard.appendChild(curWrap);
-    // (costCard built above; assembled into the top grid below.)
 
-    /* Compact plan summary — pulls the trip shape up into the top-right rail */
+    /* Compact plan summary */
     var summaryCard = el("section", "card plan-summary");
     summaryCard.appendChild(el("h3", "card-title", "Your plan"));
     var sumList = el("dl", "summary-list");
     function sumRow(k, v) { sumList.appendChild(el("dt", null, k)); sumList.appendChild(el("dd", null, v)); }
     sumRow("Regions", regions.map(function (r) { return r.name; }).join(", "));
     sumRow("Days", String(params.days));
+    sumRow("Travellers", paxLabel);
     sumRow("Style", styleName);
     if (params.month) sumRow("When", params.month);
     if (params.from) sumRow("From", params.from);
@@ -389,7 +434,7 @@
     editLink.addEventListener("click", function (e) { e.preventDefault(); showForm(); fillForm(getParams()); window.scrollTo({ top: 0, behavior: "smooth" }); });
     summaryCard.appendChild(editLink);
 
-    /* Trip essentials (booking basics), pulled up to the top rail */
+    /* Trip essentials */
     var essCard = el("section", "card essentials-card");
     essCard.appendChild(el("h3", "card-title", "Trip essentials"));
     essCard.appendChild(el("p", "muted", "Book the basics — flights, rooms, data and cover."));
@@ -397,10 +442,9 @@
       var b = ctaButton(slug);
       if (b) { b.classList.add("cta-block"); essCard.appendChild(b); }
     });
-    essCard.appendChild(el("p", "small-print",
-      "We may earn a commission from bookings made through these links, at no extra cost to you."));
+    essCard.appendChild(el("p", "small-print", "We may earn a commission from bookings made through these links, at no extra cost to you."));
 
-    /* TOP row: cost (left) + compact rail (right) — 2-column from the top */
+    /* TOP row: cost (left) + compact rail (right) */
     var topGrid = el("div", "result-grid");
     topGrid.appendChild(costCard);
     var topRail = el("div", "result-rail");
@@ -414,22 +458,17 @@
 
     var itinCard = el("section", "card");
     itinCard.appendChild(el("h3", "card-title", "Day by day"));
-    itinCard.appendChild(el("p", "muted",
-      "A skeleton to shape your own trip around — not a fixed schedule."));
-    // Map region name → image slug
+    itinCard.appendChild(el("p", "muted", "A skeleton to shape your own trip around — not a fixed schedule."));
     var IMG_SLUG = {
-      "Dhaka Gateway":           "dhaka-gateway",
-      "Sundarbans":              "sundarbans",
-      "Cox's Bazar & St Martin": "coxs-bazar",
-      "Sylhet & Srimangal":      "sylhet",
-      "Chittagong Hill Tracts":  "hill-tracts"
+      "Dhaka Gateway":          "dhaka-gateway",
+      "Sundarbans":             "sundarbans",
+      "Cox's Bazar & St Martin":"coxs-bazar",
+      "Sylhet & Srimangal":     "sylhet",
+      "Chittagong Hill Tracts": "hill-tracts"
     };
-
     var list = el("ol", "itinerary");
     buildItinerary(params).forEach(function (d) {
       var li = el("li", "itin-day");
-
-      // Thumbnail (96×72, 4:3, lazy, gradient fallback)
       var slug = IMG_SLUG[d.region] || d.region.toLowerCase().replace(/[^a-z0-9]+/g, "-");
       var img = document.createElement("img");
       img.className = "itin-thumb";
@@ -441,8 +480,6 @@
       img.decoding = "async";
       img.onerror = function () { this.style.display = "none"; };
       li.appendChild(img);
-
-      // Text body
       var body = el("div", "itin-body");
       var top = el("div", "itin-top");
       top.appendChild(el("span", "itin-num", "Day " + d.day));
@@ -451,12 +488,10 @@
       body.appendChild(el("h4", "itin-title", d.title));
       body.appendChild(el("p", "itin-detail", d.detail));
       li.appendChild(body);
-
       list.appendChild(li);
     });
     itinCard.appendChild(list);
 
-    // Closing action card at bottom of left column
     var actCard = el("div", "plan-actions-card");
     actCard.appendChild(el("p", "pac-label", "What next?"));
     var editBtn = el("button", "cta-sm", "✎ Adjust these choices");
@@ -477,12 +512,11 @@
     });
     actCard.appendChild(copyBtn2);
     itinCard.appendChild(actCard);
-
     mainGrid.appendChild(itinCard);
 
     var rail = el("div", "result-rail");
 
-    // Visa (full)
+    /* Visa (full) */
     var visa = resolveVisa(params.from);
     var visaCard = el("section", "card visa-card");
     visaCard.appendChild(el("h3", "card-title", "Visa"));
@@ -492,14 +526,13 @@
     } else {
       visaCard.appendChild(el("p", "muted", "Tell us your country to see the visa route."));
     }
-    visaCard.appendChild(el("p", "verify-note",
-      "⚠ Visa rules change often. Always confirm with an official Bangladesh mission or e-visa portal before booking flights."));
+    visaCard.appendChild(el("p", "verify-note", "⚠ Visa rules change often. Always confirm with an official Bangladesh mission or e-visa portal before booking flights."));
     var visaMore = el("a", "text-link", "See the full visa summary →");
     visaMore.href = "visa.html";
     visaCard.appendChild(visaMore);
     rail.appendChild(visaCard);
 
-    // Experiences + booking CTAs
+    /* Experiences */
     var expCard = el("section", "card");
     expCard.appendChild(el("h3", "card-title", "Experiences to book"));
     regions.forEach(function (r) {
@@ -521,18 +554,14 @@
 
     mainGrid.appendChild(rail);
     root.appendChild(mainGrid);
-
-    /* Share bar */
     root.appendChild(buildShareBar());
-
-    /* JSON-LD: describe the plan honestly as an ItemList (no govt entity) */
     injectItineraryJsonLd(params, regions);
   }
 
   function buildShareBar() {
     var bar = el("div", "share-bar");
     bar.appendChild(el("p", "share-lead", "Share this plan"));
-    bar.appendChild(el("p", "muted", "The link holds your whole plan — send it and it rebuilds exactly."));
+    bar.appendChild(el("p", "muted", "The link holds your whole plan — pax, currency and all. Send it and it rebuilds exactly."));
     var row = el("div", "share-row");
     var input = el("input", "share-input");
     input.type = "text";
@@ -542,17 +571,10 @@
     copyBtn.type = "button";
     copyBtn.addEventListener("click", function () {
       input.select();
-      var done = function () {
-        copyBtn.textContent = "Copied ✓";
-        setTimeout(function () { copyBtn.textContent = "Copy plan link"; }, 1800);
-      };
+      var done = function () { copyBtn.textContent = "Copied ✓"; setTimeout(function () { copyBtn.textContent = "Copy plan link"; }, 1800); };
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(input.value).then(done, function () {
-          try { document.execCommand("copy"); done(); } catch (e) {}
-        });
-      } else {
-        try { document.execCommand("copy"); done(); } catch (e) {}
-      }
+        navigator.clipboard.writeText(input.value).then(done, function () { try { document.execCommand("copy"); done(); } catch (e) {} });
+      } else { try { document.execCommand("copy"); done(); } catch (e) {} }
     });
     row.appendChild(input);
     row.appendChild(copyBtn);
@@ -587,26 +609,28 @@
   function fillForm(params) {
     var form = $("#planner-form");
     if (!form) return;
-    // regions checkboxes
     $all("input[name='regions']", form).forEach(function (cb) {
       cb.checked = params.regions.indexOf(cb.value) !== -1;
     });
-    // days
     var days = $("#f-days", form);
     if (days && params.days) days.value = params.days;
     var daysOut = $("#f-days-out");
     if (daysOut) daysOut.textContent = (days ? days.value : "7") + " days";
-    // style
     $all("input[name='style']", form).forEach(function (r) {
       r.checked = r.value === params.style;
     });
-    // from
     var from = $("#f-from", form);
     if (from && params.from) from.value = params.from;
-    // month
     var month = $("#f-month", form);
     if (month && params.month) month.value = params.month;
+    /* Pax stepper */
+    var paxIn = $("#f-pax", form);
+    var paxCount = $("#pax-count");
+    if (paxIn) paxIn.value = params.pax || 1;
+    if (paxCount) paxCount.textContent = paxLabel(params.pax || 1);
   }
+
+  function paxLabel(n) { return n === 1 ? "1 traveller" : n + " travellers"; }
 
   function readForm() {
     var form = $("#planner-form");
@@ -615,7 +639,9 @@
     var days = parseInt($("#f-days", form).value, 10) || 7;
     var from = ($("#f-from", form).value || "").trim();
     var month = ($("#f-month", form).value || "").trim();
-    return { regions: regions, style: style, days: days, from: from, month: month };
+    var pax = parseInt(($("#f-pax", form) || {}).value, 10) || 1;
+    pax = clamp(pax, 1, 12);
+    return { regions: regions, style: style, days: days, from: from, month: month, pax: pax };
   }
 
   function buildQuery(state) {
@@ -623,12 +649,19 @@
     if (state.regions.length) p.set("regions", state.regions.join(","));
     p.set("days", state.days);
     p.set("style", state.style);
+    if (state.pax && state.pax > 1) p.set("pax", state.pax);
     if (state.from) p.set("from", state.from);
     if (state.month) p.set("month", state.month);
-    // Currency: only carry cur when the user has explicitly picked it via the
-    // switcher. Country selection sets the visa route, not the currency.
-    // Default display is always USD on first load.
-    var cur = getParams().cur;
+    /* Currency: if user manually picked one, keep it;
+       otherwise auto-derive from country */
+    var cur;
+    if (_userPickedCur) {
+      cur = getParams().cur;
+    } else if (state.from) {
+      cur = resolveCountryCurrency(state.from) || "USD";
+    } else {
+      cur = getParams().cur || "USD";
+    }
     if (cur && cur !== "USD") p.set("cur", cur);
     return p.toString();
   }
@@ -650,7 +683,7 @@
     var form = $("#planner-form");
     var params = getParams();
 
-    // Populate the country datalist from COUNTRIES data
+    /* Populate the country datalist */
     if (typeof COUNTRIES !== "undefined") {
       var dl = document.getElementById("country-list");
       if (dl) {
@@ -665,12 +698,47 @@
 
     if (form) {
       fillForm(params);
-      // live day readout
-      var days = $("#f-days", form);
+
+      /* Live day readout */
+      var daysInput = $("#f-days", form);
       var daysOut = $("#f-days-out");
-      if (days && daysOut) {
-        days.addEventListener("input", function () { daysOut.textContent = days.value + " days"; });
+      if (daysInput && daysOut) {
+        daysInput.addEventListener("input", function () { daysOut.textContent = daysInput.value + " days"; });
       }
+
+      /* Pax stepper */
+      var paxIn = $("#f-pax", form);
+      var paxCount = $("#pax-count");
+      var paxDec = $("#pax-dec");
+      var paxInc = $("#pax-inc");
+      var currentPax = params.pax || 1;
+      function updatePax(n) {
+        currentPax = clamp(n, 1, 12);
+        if (paxIn) paxIn.value = currentPax;
+        if (paxCount) paxCount.textContent = paxLabel(currentPax);
+        if (paxDec) paxDec.disabled = currentPax <= 1;
+        if (paxInc) paxInc.disabled = currentPax >= 12;
+      }
+      if (paxDec) paxDec.addEventListener("click", function () { updatePax(currentPax - 1); });
+      if (paxInc) paxInc.addEventListener("click", function () { updatePax(currentPax + 1); });
+      updatePax(currentPax);
+
+      /* Auto-switch currency when country changes */
+      var fromInput = $("#f-from", form);
+      if (fromInput) {
+        fromInput.addEventListener("change", function () {
+          if (_userPickedCur) return; // user already picked manually — respect that
+          var country = fromInput.value.trim();
+          var cur = resolveCountryCurrency(country);
+          if (cur) {
+            var p2 = new URLSearchParams(window.location.search);
+            p2.set("cur", cur);
+            history.replaceState(null, "", "plan.html?" + p2.toString());
+          }
+        });
+      }
+
+      /* Form submission */
       form.addEventListener("submit", function (e) {
         e.preventDefault();
         var state = readForm();
@@ -688,7 +756,6 @@
       });
     }
 
-    // If we arrived with a full plan in the URL, show the result.
     if (params.regions.length && params.days) {
       showResult();
       renderResult(params);
