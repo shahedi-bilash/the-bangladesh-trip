@@ -518,6 +518,125 @@ a:hover { text-decoration-color: currentColor; }
 .mt-0 { margin-top: 0; }
 .stack > * + * { margin-top: 1rem; }
 
+/* =====================================================================
+   SPOT PLANNER (spots.html)
+   ===================================================================== */
+
+/* Hero */
+.sp-hero { padding: 3rem 0 1.5rem; }
+.sp-hero h1 { max-width: 20ch; margin-bottom: .5rem; }
+.sp-hero .lead { margin-bottom: 0; }
+
+/* Filter bar */
+.sp-filter-bar { background: var(--paper); border-bottom: 1px solid var(--line); position: sticky; top: 56px; z-index: 20; }
+.sp-filters { display: flex; flex-wrap: wrap; gap: .4rem; padding: .65rem 0; }
+.sp-filter { display: inline-flex; align-items: center; gap: .3rem; font-family: var(--sans); font-size: .85rem; font-weight: 600; padding: .35rem .85rem; border-radius: 999px; border: 1.5px solid var(--line); background: transparent; color: var(--ink-70); cursor: pointer; transition: background .14s ease, border-color .14s, color .14s; }
+.sp-filter:hover { border-color: var(--teal); color: var(--teal-600); }
+.sp-filter.is-active { background: var(--teal); border-color: var(--teal); color: #fff; }
+
+/* Two-column layout */
+.sp-layout { display: grid; grid-template-columns: 1fr 336px; gap: 2rem; align-items: start; padding-top: 2rem; padding-bottom: 3rem; }
+
+/* Spot grid */
+.sp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.1rem; }
+
+/* Spot card */
+.sp-card { border: 2px solid transparent; border-radius: var(--radius); overflow: hidden; background: var(--paper); box-shadow: var(--shadow); cursor: pointer; transition: border-color .18s, box-shadow .18s, transform .18s ease; padding: 0; text-align: left; width: 100%; }
+.sp-card:hover { box-shadow: 0 8px 32px rgba(4,34,20,.13); transform: translateY(-2px); }
+.sp-card:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+.sp-card.is-selected { border-color: var(--sand); }
+.sp-card.is-selected:hover { box-shadow: 0 8px 32px rgba(199,154,62,.22); }
+
+/* Card photo */
+.sp-card-img { position: relative; aspect-ratio: 3/2; overflow: hidden; }
+.sp-card-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .35s ease; }
+.sp-card:hover .sp-card-img img { transform: scale(1.05); }
+.sp-dur { position: absolute; top: .55rem; right: .55rem; background: rgba(4,34,20,.72); color: #fff; font-size: .72rem; font-weight: 600; padding: .2rem .55rem; border-radius: 999px; backdrop-filter: blur(3px); letter-spacing: .03em; }
+.sp-check-ring { position: absolute; top: .55rem; left: .55rem; width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(255,255,255,.65); background: rgba(255,255,255,.15); display: flex; align-items: center; justify-content: center; transition: background .18s, border-color .18s; color: transparent; }
+.sp-card.is-selected .sp-check-ring { background: var(--sand); border-color: var(--sand); color: var(--ink); }
+
+/* Card body */
+.sp-card-body { padding: .85rem 1rem 1rem; }
+.sp-region-label { display: block; font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--sand); margin-bottom: .3rem; }
+.sp-name { font-family: var(--serif); font-size: 1.05rem; font-weight: 500; margin: 0 0 .3rem; color: var(--ink); }
+.sp-desc { font-size: .84rem; color: var(--ink-70); margin: 0 0 .65rem; line-height: 1.45; }
+.sp-tags { display: flex; flex-wrap: wrap; gap: .3rem; margin-bottom: .7rem; }
+.sp-tag { font-size: .7rem; background: rgba(11,110,79,.08); color: var(--teal-600); border-radius: 999px; padding: .15rem .5rem; }
+.sp-aff { font-size: .8rem; padding: .4rem .9rem; margin-top: 0; }
+
+/* ── Plan panel ─────────────────────────────────────────────────────── */
+.sp-panel { position: sticky; top: 105px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); max-height: calc(100vh - 120px); overflow-y: auto; }
+.sp-panel-empty { padding: 2.5rem 1.25rem; text-align: center; color: var(--ink-70); }
+.sp-panel-empty-icon { font-size: 2.2rem; margin-bottom: .65rem; }
+.sp-panel-empty-title { font-family: var(--serif); font-size: 1.1rem; color: var(--ink); margin: 0 0 .3rem; }
+.sp-panel-empty-sub { font-size: .87rem; margin: 0; }
+
+/* Plan header (teal band) */
+.sp-plan-hdr { background: var(--teal); color: #fff; padding: 1rem 1.1rem .85rem; border-radius: var(--radius) var(--radius) 0 0; }
+.sp-plan-hdr h3 { color: #fff; margin: 0 0 .7rem; font-size: 1rem; }
+.sp-plan-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; }
+.sp-plan-stat { text-align: center; padding: .25rem 0; }
+.sp-plan-stat:not(:last-child) { border-right: 1px solid rgba(255,255,255,.2); }
+.sp-stat-num { display: block; font-size: 1.7rem; font-weight: 700; font-family: var(--serif); color: #fff; line-height: 1; }
+.sp-stat-lbl { font-size: .68rem; color: rgba(255,255,255,.75); text-transform: uppercase; letter-spacing: .07em; }
+
+/* Cost box */
+.sp-plan-cost { margin: 0; padding: .9rem 1.1rem; background: var(--cream); border-bottom: 1px solid var(--line); }
+.sp-cost-row { display: flex; justify-content: space-between; align-items: baseline; font-size: .88rem; margin-bottom: .2rem; }
+.sp-cost-row span:first-child { font-weight: 600; }
+.sp-cost-val { font-weight: 600; }
+.sp-cost-val small { font-weight: 400; color: var(--ink-70); font-size: .78em; }
+.sp-cost-comfort .sp-cost-val { color: var(--teal-600); }
+.sp-cost-note { font-size: .74rem; color: var(--ink-70); margin: .4rem 0 0; }
+
+/* Day-by-day */
+.sp-section-hd { font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-70); margin: .9rem 0 .4rem; padding: 0 1.1rem; }
+.sp-day { margin: 0 .8rem .4rem; border: 1px solid var(--line); border-radius: var(--radius-sm); overflow: hidden; }
+.sp-day-hd { font-size: .86rem; font-weight: 600; padding: .45rem .75rem; background: var(--cream); color: var(--ink); }
+.sp-day-bd { padding: .35rem .75rem .55rem; }
+.sp-day-spot { font-size: .83rem; color: var(--ink-70); padding: .12rem 0; display: flex; gap: .4rem; align-items: baseline; }
+.sp-dot { color: var(--sand); font-size: 1.1em; flex-shrink: 0; }
+.sp-dur-inline { font-size: .78em; color: var(--ink-70); }
+.sp-day-dep { font-size: .83rem; color: var(--ink-70); margin: 0; font-style: italic; }
+.sp-plan-transfer { font-size: .81rem; color: var(--ink-70); padding: .35rem 1.1rem; border-left: 3px solid var(--sand); margin: .4rem .8rem; font-style: italic; }
+.sp-tr-note { opacity: .75; }
+
+/* Hotels */
+.sp-hotel-section { padding: 0 0 .2rem; }
+.sp-hotel-row { display: flex; justify-content: space-between; align-items: center; font-size: .86rem; padding: .3rem 1.1rem; border-top: 1px solid var(--line); }
+.sp-hotel-btn { margin-top: 0; font-size: .78rem; padding: .3rem .7rem; }
+
+/* Actions */
+.sp-plan-actions { display: flex; flex-direction: column; gap: .5rem; padding: .9rem 1.1rem 0; }
+.sp-plan-full { text-align: center; display: flex; justify-content: center; }
+.sp-share-btn { text-align: center; }
+.sp-plan-disclosure { font-size: .7rem; color: var(--ink-70); text-align: center; margin: .5rem 1.1rem 1rem; }
+
+/* Bottom alt-CTA */
+.sp-alt-cta { background: var(--cream); border-top: 1px solid var(--line); padding: 1.5rem 0; text-align: center; }
+.sp-alt-cta p { color: var(--ink-70); margin-bottom: .75rem; }
+
+/* Region-page spot teaser band */
+.sp-teaser { background: rgba(11,110,79,.04); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.5rem 1.5rem 1.8rem; margin: 1.5rem 0; }
+.sp-teaser h2 { font-size: 1.4rem; margin-bottom: .35rem; }
+.sp-teaser .lead { font-size: 1rem; margin-bottom: 1rem; }
+.sp-teaser-chips { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: 1.2rem; }
+.sp-teaser-chip { font-size: .78rem; background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: .2rem .65rem; color: var(--ink-70); }
+
+/* Responsive */
+@media (max-width: 960px) {
+  .sp-layout { grid-template-columns: 1fr; }
+  .sp-panel { position: static; max-height: none; }
+  .sp-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+}
+@media (max-width: 560px) {
+  .sp-grid { grid-template-columns: 1fr 1fr; gap: .7rem; }
+  .sp-card-body { padding: .65rem .75rem .75rem; }
+}
+@media (max-width: 380px) {
+  .sp-grid { grid-template-columns: 1fr; }
+}
+
 /* ---- Custom cursors (last, so they beat per-component pointer rules;
         gated on no-preference for a clean reduced-motion fallback) ---- */
 @media (prefers-reduced-motion: no-preference) {
@@ -525,6 +644,7 @@ a:hover { text-decoration-color: currentColor; }
   a, button, summary, label,
   .card, .region-card, .crosslink, .cur-btn, .choice label,
   .cta, .cta-ghost, .nav-cta, .nav-toggle, .rail-book, .map-links a, .map-pin,
+  .sp-card, .sp-filter,
   input[type=submit], [role=button] { cursor: url('/assets/img/cursor-pin.png') 14 14, pointer; }
   input, textarea, select { cursor: text; }
 }
