@@ -178,6 +178,95 @@ const REGIONS = [
     ],
     image: "assets/img/hill-tracts.webp",
     imageCredit: "TODO(owner): add photographer + license"
+  },
+  {
+    id: "northbengal",
+    name: "North Bengal",
+    slug: "north-bengal",
+    tagline: "Bangladesh's oldest civilisation — Buddhist ruins, Mughal mosques and mango orchards.",
+    bestMonths: ["Nov", "Dec", "Jan", "Feb"],
+    gettingThere: "Rajshahi is 6–7 hrs by Intercity train from Dhaka; Bogura is ~4 hrs by bus. The Paharpur ruins are 13 km from Bogura by auto-rickshaw.",
+    minDays: 2,
+    perDayUSD: { backpacker: [12, 22], comfort: [32, 68], premium: [85, 180] },
+    experiences: [
+      { title: "Somapura Mahavihara (Paharpur)", note: "The largest Buddhist monastery south of the Himalayas — 177 cells around a stepped vihara. UNESCO World Heritage.", affiliate: "klook" },
+      { title: "Mahasthangarh", note: "Bangladesh's oldest known city, occupied from at least the 3rd century BCE. Fortified mound, site museum, river views.", affiliate: "" },
+      { title: "Puthia temple complex", note: "The greatest concentration of historic Hindu temples in Bangladesh — five temples in a single 19th-century royal compound.", affiliate: "" },
+      { title: "Varendra Research Museum", note: "The oldest museum in Bangladesh (est. 1910) — Pala bronzes, Sultanate coins and 2,000 years of Bengal artefacts.", affiliate: "" }
+    ],
+    dayTemplates: [
+      { title: "Bogura + Paharpur", detail: "Travel overnight from Dhaka to Bogura. Morning at Somapura Mahavihara, afternoon at Mahasthangarh." },
+      { title: "Puthia & Rajshahi", detail: "Bus to Rajshahi, stop at Puthia temples, afternoon at the Varendra Research Museum." },
+      { title: "Rajshahi riverfront", detail: "The silk quarter, Rajshahi waterfront, and mango orchards in season (May–Jun)." }
+    ],
+    image: "assets/img/north-bengal.webp",
+    imageCredit: "TODO(owner): add — suggest Somapura Mahavihara (Wikimedia CC BY-SA)"
+  },
+  {
+    id: "kuakata",
+    name: "Kuakata",
+    slug: "kuakata",
+    tagline: "The only beach in Bangladesh where you can watch both sunrise and sunset from the same sand.",
+    bestMonths: ["Nov", "Dec", "Jan", "Feb", "Mar"],
+    gettingThere: "Bus from Dhaka to Patuakhali (~7 hrs) then local transport (~2 hrs), or direct Kuakata bus (~9 hrs) from Gabtoli. Launches via Barisal also run.",
+    minDays: 2,
+    perDayUSD: { backpacker: [10, 20], comfort: [28, 58], premium: [70, 145] },
+    experiences: [
+      { title: "Sunrise & sunset at Zero Point", note: "The only place in Bangladesh where both are visible from the same beach — sunrise east, sunset west, same day.", affiliate: "" },
+      { title: "Fatrar Char mangrove forest", note: "A tidal char reached by trawler — dense mangroves, herons, deer, crocodiles and complete quiet.", affiliate: "klook" },
+      { title: "Rakhine village visit", note: "A Buddhist Rakhine community with small pagodas and hand-woven textiles — a culture entirely distinct from Bengali coastal life.", affiliate: "" },
+      { title: "Gangamati Reserve Forest", note: "The forest strip behind the beach, good for birds and a shaded walk when the midday sun is at its height.", affiliate: "" }
+    ],
+    dayTemplates: [
+      { title: "Arrive & sunrise", detail: "Travel from Dhaka, arrive by evening. Up before dawn for the famous sunrise from Zero Point beach." },
+      { title: "Mangroves & village", detail: "Morning trawler to Fatrar Char mangrove forest, then the Rakhine village, long sunset watch." }
+    ],
+    image: "assets/img/kuakata.webp",
+    imageCredit: "TODO(owner): add — suggest Kuakata beach sunrise (Wikimedia CC BY-SA)"
+  },
+  {
+    id: "bagerhat",
+    name: "Bagerhat",
+    slug: "bagerhat",
+    tagline: "A city of medieval mosques — UNESCO World Heritage, built by a saint-governor in the 15th century.",
+    bestMonths: ["Nov", "Dec", "Jan", "Feb"],
+    gettingThere: "Bus from Dhaka to Khulna (~7 hrs), then 1-hr bus to Bagerhat. Pairs naturally with the Sundarbans — both are in the Khulna region.",
+    minDays: 1,
+    perDayUSD: { backpacker: [10, 18], comfort: [26, 55], premium: [65, 135] },
+    experiences: [
+      { title: "Sixty Dome Mosque (Shat Gombuj)", note: "77 domes, 60 pillars, 26 doors — surrounded by water on three sides. Bangladesh's finest medieval mosque. UNESCO.", affiliate: "klook" },
+      { title: "Khan Jahan Ali's shrine & pond", note: "The founder's mausoleum and a sacred pond whose tame crocodiles are fed by worshippers every Friday afternoon.", affiliate: "" },
+      { title: "Nine Dome Mosque (Nau Gumbad)", note: "Nine carved domes, fine terracotta brickwork — less visited than the main site and often more atmospheric.", affiliate: "" },
+      { title: "Singair Mosque & Bagerhat Museum", note: "The finest terracotta-ornamented mosque in the city, and a small but thorough museum of the medieval sultanate.", affiliate: "" }
+    ],
+    dayTemplates: [
+      { title: "Bagerhat full day", detail: "Sixty Dome Mosque first, Khan Jahan Ali's shrine and crocodile pond, Nine Dome Mosque, Singair at golden hour." },
+      { title: "Bagerhat + Khulna + Sundarbans", detail: "Bagerhat in the morning, Khulna for lunch, connect to Mongla for the Sundarbans boat tour." }
+    ],
+    image: "assets/img/bagerhat.webp",
+    imageCredit: "TODO(owner): add — suggest Sixty Dome Mosque (Wikimedia CC BY-SA)"
+  },
+  {
+    id: "comilla",
+    name: "Comilla & Mainamati",
+    slug: "comilla-mainamati",
+    tagline: "Buddhist monastery ruins from the 7th century — an easy stop between Dhaka and the east.",
+    bestMonths: ["Oct", "Nov", "Dec", "Jan", "Feb", "Mar"],
+    gettingThere: "Bus from Dhaka (~2 hrs). Perfectly placed en route to Cox's Bazar or the Hill Tracts — breaks a long journey with a half-day of history.",
+    minDays: 1,
+    perDayUSD: { backpacker: [10, 18], comfort: [25, 52], premium: [60, 120] },
+    experiences: [
+      { title: "Shalban Vihara", note: "A 7th–12th century Buddhist monastery with 115 meditation cells around a stepped central vihara. Still being excavated.", affiliate: "" },
+      { title: "Mainamati Museum", note: "5,000+ artefacts from the hilltop excavations — bronzes, coins, votive stupas and jewellery spanning seven centuries.", affiliate: "" },
+      { title: "Mainamati War Cemetery", note: "736 Allied soldiers who died in the 1943–44 Burma campaign. Immaculate Commonwealth War Graves grounds, quiet and moving.", affiliate: "" },
+      { title: "Dharmasagar Lake", note: "An 18th-century ornamental tank in Comilla town — ghats, morning light on the water and a gentle circuit walk.", affiliate: "" }
+    ],
+    dayTemplates: [
+      { title: "Mainamati half-day", detail: "Arrive from Dhaka mid-morning. Shalban Vihara, the museum, the War Cemetery in the afternoon." },
+      { title: "Comilla town + onwards", detail: "Morning at Dharmasagar, lunch in Comilla, bus east toward Cox's Bazar or Chittagong." }
+    ],
+    image: "assets/img/comilla.webp",
+    imageCredit: "TODO(owner): add — suggest Shalban Vihara (Wikimedia CC BY-SA)"
   }
 ];
 

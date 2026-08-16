@@ -10,7 +10,11 @@ var REGION_LABELS = {
   "sundarbans":    "Sundarbans",
   "coxs-bazar":   "Cox's Bazar & St Martin's",
   "sylhet":        "Sylhet & Srimangal",
-  "hill-tracts":   "Chittagong Hill Tracts"
+  "hill-tracts":   "Chittagong Hill Tracts",
+  "north-bengal":  "North Bengal (Paharpur)",
+  "kuakata":       "Kuakata",
+  "bagerhat":      "Bagerhat",
+  "comilla":       "Comilla–Mainamati"
 };
 
 /* Slugs used in plan.html?regions= */
@@ -19,7 +23,11 @@ var REGION_PLAN_SLUG = {
   "sundarbans":    "sundarbans",
   "coxs-bazar":   "coxsbazar",
   "sylhet":        "sylhet",
-  "hill-tracts":   "hilltracts"
+  "hill-tracts":   "hilltracts",
+  "north-bengal":  "northbengal",
+  "kuakata":       "kuakata",
+  "bagerhat":      "bagerhat",
+  "comilla":       "comilla"
 };
 
 /* Hotel cost ranges: [min, max] USD per person per night */
@@ -31,7 +39,12 @@ var SPOT_HOTEL_COSTS = {
   "Sylhet":       { budget: [12, 20], comfort: [40,  70] },
   "Srimangal":    { budget: [10, 18], comfort: [30,  55] },
   "Rangamati":    { budget: [10, 18], comfort: [35,  60] },
-  "Bandarban":    { budget: [8,  16], comfort: [30,  55] }
+  "Bandarban":    { budget: [8,  16], comfort: [30,  55] },
+  "Rajshahi":     { budget: [10, 18], comfort: [35,  65] },
+  "Bogura":       { budget: [8,  15], comfort: [28,  55] },
+  "Kuakata":      { budget: [10, 18], comfort: [30,  60] },
+  "Bagerhat":     { budget: [8,  15], comfort: [25,  50] },
+  "Comilla":      { budget: [8,  14], comfort: [25,  50] }
 };
 
 /* Inter-region transfers: cost[0]=budget, cost[1]=comfort USD/person one-way */
@@ -45,7 +58,17 @@ var INTER_REGION_COSTS = {
   "sundarbans:hill-tracts":   { label: "Khulna → Chittagong (bus)",                     cost: [10, 22] },
   "coxs-bazar:sylhet":        { label: "Cox's Bazar → Sylhet",                          cost: [15, 32] },
   "coxs-bazar:hill-tracts":   { label: "Cox's Bazar → Chittagong (bus)",                cost: [5,  12] },
-  "sylhet:hill-tracts":       { label: "Sylhet → Chittagong (bus)",                     cost: [10, 22] }
+  "sylhet:hill-tracts":       { label: "Sylhet → Chittagong (bus)",                     cost: [10, 22] },
+  "dhaka-gateway:north-bengal":{ label: "Dhaka → Rajshahi/Bogura (train or bus)",       cost: [5,  18] },
+  "dhaka-gateway:kuakata":     { label: "Dhaka → Kuakata (bus)",                        cost: [8,  22] },
+  "dhaka-gateway:bagerhat":    { label: "Dhaka → Khulna then Bagerhat (bus)",           cost: [6,  20] },
+  "dhaka-gateway:comilla":     { label: "Dhaka → Comilla (bus or train)",               cost: [3,   8] },
+  "sundarbans:bagerhat":       { label: "Khulna/Mongla → Bagerhat (bus)",               cost: [2,   8] },
+  "sundarbans:kuakata":        { label: "Khulna → Kuakata (bus/launch)",                cost: [8,  20] },
+  "bagerhat:kuakata":          { label: "Bagerhat/Khulna → Kuakata (bus)",              cost: [8,  20] },
+  "comilla:coxs-bazar":        { label: "Comilla → Cox's Bazar (bus)",                  cost: [8,  22] },
+  "comilla:hill-tracts":       { label: "Comilla → Chittagong (bus)",                   cost: [5,  14] },
+  "north-bengal:comilla":      { label: "Rajshahi → Comilla (train/bus)",               cost: [12, 28] }
 };
 
 /* ---- SPOT DATA -------------------------------------------------------
@@ -377,6 +400,187 @@ var SPOTS = {
       aff:      null,
       desc:     "A hillside market where Marma, Bawm and Chakma communities trade — handwoven fabric, bamboo shoots, tropical fruit and local silver jewellery.",
       tags:     ["culture", "photography"]
+    }
+  ],
+
+  /* ── NORTH BENGAL (PAHARPUR / RAJSHAHI) ─────────────────────────────── */
+  "north-bengal": [
+    {
+      id:       "somapura-mahavihara",
+      name:     "Somapura Mahavihara (UNESCO)",
+      photo:    "/assets/img/nb-somapura.webp",
+      duration: 1,
+      base:     "Bogura",
+      transfer: { cost: [3, 8], note: "Bus/CNG from Bogura" },
+      aff:      null,
+      desc:     "The largest Buddhist monastery in South Asia, built in the 8th century under the Pala dynasty. The cross-shaped terracotta ruins rise from vast green plains — a UNESCO World Heritage Site of rare quietness.",
+      tags:     ["history", "UNESCO", "archaeology"]
+    },
+    {
+      id:       "mahasthangarh",
+      name:     "Mahasthangarh Citadel",
+      photo:    "/assets/img/nb-mahasthan.webp",
+      duration: 0.5,
+      base:     "Bogura",
+      transfer: { cost: [2, 6], note: "Bus north from Bogura" },
+      aff:      null,
+      desc:     "One of the earliest urban archaeological sites in Bangladesh, continuously inhabited from at least the 3rd century BC. Massive mud ramparts overlook the Karatoa River.",
+      tags:     ["history", "archaeology"]
+    },
+    {
+      id:       "puthia-temples",
+      name:     "Puthia Temple Complex",
+      photo:    "/assets/img/nb-puthia.webp",
+      duration: 0.5,
+      base:     "Rajshahi",
+      transfer: { cost: [2, 6], note: "Bus from Rajshahi" },
+      aff:      null,
+      desc:     "Bangladesh's largest concentration of Hindu temples in a single campus — terracotta-carved towers ranging from the 17th to 19th century, arranged around a sacred tank.",
+      tags:     ["history", "architecture", "culture"]
+    },
+    {
+      id:       "varendra-museum",
+      name:     "Varendra Research Museum",
+      photo:    "/assets/img/nb-varendra.webp",
+      duration: 0.5,
+      base:     "Rajshahi",
+      transfer: { cost: [0, 2], note: "City centre, Rajshahi" },
+      aff:      null,
+      desc:     "Bangladesh's oldest museum, founded 1910. Remarkable collection of stone sculpture, coins and inscriptions from Bengal's Buddhist and Hindu kingdoms, including Pala masterpieces.",
+      tags:     ["history", "culture", "museum"]
+    }
+  ],
+
+  /* ── KUAKATA ─────────────────────────────────────────────────────────── */
+  "kuakata": [
+    {
+      id:       "kuakata-beach",
+      name:     "Kuakata Sunrise & Sunset Point",
+      photo:    "/assets/img/kuakata-beach.webp",
+      duration: 1,
+      base:     "Kuakata",
+      transfer: { cost: [0, 2], note: "Town beach, walk from guesthouses" },
+      aff:      null,
+      desc:     "Bangladesh's only beach where you can watch both sunrise and sunset from the same strip of sand. The sea horizon is unbroken — arrive before dawn for the full spectacle.",
+      tags:     ["beach", "photography", "nature"]
+    },
+    {
+      id:       "rakhine-village",
+      name:     "Rakhine Village & Weaving",
+      photo:    "/assets/img/kuakata-rakhine.webp",
+      duration: 0.5,
+      base:     "Kuakata",
+      transfer: { cost: [1, 3], note: "Rickshaw from Kuakata centre" },
+      aff:      null,
+      desc:     "A living Rakhine (Arakanese) settlement on the shore, where women weave traditional cloth on backstrap looms. One of the few remaining Rakhine communities in Bangladesh.",
+      tags:     ["culture", "photography"]
+    },
+    {
+      id:       "fatrar-char",
+      name:     "Fatrar Char Mangrove",
+      photo:    "/assets/img/kuakata-fatrar.webp",
+      duration: 1,
+      base:     "Kuakata",
+      transfer: { cost: [4, 10], note: "Trawler from Kuakata beach" },
+      aff:      null,
+      desc:     "A dense mangrove island accessible by boat — a miniature Sundarbans. Spotted deer and crocodiles have been reported; migratory birds roost in winter.",
+      tags:     ["nature", "wildlife", "boat"]
+    },
+    {
+      id:       "gangamati",
+      name:     "Gangamati Forest Reserve",
+      photo:    "/assets/img/kuakata-gangamati.webp",
+      duration: 0.5,
+      base:     "Kuakata",
+      transfer: { cost: [2, 5], note: "Bicycle/CNG from Kuakata" },
+      aff:      null,
+      desc:     "A narrow coastal forest belt running behind the beach dunes — a shaded walk of wild shrubs, wild boar tracks and the distant crash of surf.",
+      tags:     ["nature", "hiking"]
+    }
+  ],
+
+  /* ── BAGERHAT ─────────────────────────────────────────────────────────── */
+  "bagerhat": [
+    {
+      id:       "sixty-dome-mosque",
+      name:     "Sixty Dome Mosque (UNESCO)",
+      photo:    "/assets/img/bagerhat-sixty.webp",
+      duration: 1,
+      base:     "Bagerhat",
+      transfer: { cost: [2, 6], note: "Bus from Khulna" },
+      aff:      null,
+      desc:     "The largest medieval mosque in Bangladesh, built c. 1450 by Khan Jahan Ali. Eighty-one stone pillars carry seventy-seven terracotta domes in a forest of arches — UNESCO World Heritage.",
+      tags:     ["history", "UNESCO", "architecture"]
+    },
+    {
+      id:       "khan-jahan-shrine",
+      name:     "Khan Jahan Ali Shrine & Tank",
+      photo:    "/assets/img/bagerhat-khanjahan.webp",
+      duration: 0.5,
+      base:     "Bagerhat",
+      transfer: { cost: [2, 6], note: "Bus from Khulna" },
+      aff:      null,
+      desc:     "The mausoleum of Bagerhat's founder, set beside a sacred tank inhabited by saltwater crocodiles — fed by pilgrims for centuries and still remarkably tame.",
+      tags:     ["history", "culture", "pilgrimage"]
+    },
+    {
+      id:       "nine-dome-mosque",
+      name:     "Nine Dome Mosque (Nau Gumbad)",
+      photo:    "/assets/img/bagerhat-ninedome.webp",
+      duration: 0.5,
+      base:     "Bagerhat",
+      transfer: { cost: [2, 6], note: "Rickshaw from Bagerhat centre" },
+      aff:      null,
+      desc:     "A perfectly proportioned 15th-century mosque of nine equal domes in a 3×3 grid — considered the finest example of the Sultanate style in Bangladesh.",
+      tags:     ["history", "architecture"]
+    }
+  ],
+
+  /* ── COMILLA–MAINAMATI ───────────────────────────────────────────────── */
+  "comilla": [
+    {
+      id:       "shalban-vihara",
+      name:     "Shalban Vihara Buddhist Ruins",
+      photo:    "/assets/img/comilla-shalban.webp",
+      duration: 1,
+      base:     "Comilla",
+      transfer: { cost: [2, 5], note: "CNG from Comilla town" },
+      aff:      null,
+      desc:     "A 7th–12th-century Buddhist monastery complex excavated from Mainamati hill. Over one hundred meditation cells surround a central stupa — terracotta plaques litter the site museum.",
+      tags:     ["history", "archaeology", "Buddhism"]
+    },
+    {
+      id:       "mainamati-museum",
+      name:     "Mainamati Museum",
+      photo:    "/assets/img/comilla-museum.webp",
+      duration: 0.5,
+      base:     "Comilla",
+      transfer: { cost: [2, 5], note: "CNG from Comilla town" },
+      aff:      null,
+      desc:     "Houses the finest collection of Buddhist artefacts from the Mainamati excavations — gold reliquary caskets, silver bowls, terracotta figurines and illuminated manuscripts.",
+      tags:     ["history", "museum", "culture"]
+    },
+    {
+      id:       "war-cemetery-comilla",
+      name:     "Comilla War Cemetery",
+      photo:    "/assets/img/comilla-cemetery.webp",
+      duration: 0.5,
+      base:     "Comilla",
+      transfer: { cost: [1, 3], note: "CNG or rickshaw from centre" },
+      aff:      null,
+      desc:     "A Commonwealth War Graves Commission cemetery for 736 WWII soldiers — Britons, Indians, Gurkhas and West Africans who died on the Burma Campaign. Immaculately kept and profoundly moving.",
+      tags:     ["history", "memorial"]
+    },
+    {
+      id:       "dharmasagar-lake",
+      name:     "Dharmasagar Lake",
+      photo:    "/assets/img/comilla-dharmasagar.webp",
+      duration: 0.5,
+      base:     "Comilla",
+      transfer: { cost: [0, 2], note: "City centre, Comilla" },
+      aff:      null,
+      desc:     "A large medieval lake dug in 1458 by Raja Dharma Manikya. At dawn, fishermen cast hand nets from dugout canoes while egrets stalk the shallows.",
+      tags:     ["nature", "photography", "history"]
     }
   ]
 
