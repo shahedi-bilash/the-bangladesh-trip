@@ -143,8 +143,10 @@
     var pax   = params.pax || 1;
     var regions = params.regions.map(regionById).filter(Boolean);
     var nRegions = Math.max(regions.length, 1);
-    var nights = Math.max(days - 1, 1); // last day = departure, no hotel
-    var rooms  = Math.ceil(pax / 2);    // standard double-occupancy
+    var nights  = Math.max(days - 1, 1); // last day = departure, no hotel
+    var doubles = Math.floor(pax / 2);   // double rooms
+    var singles = pax % 2;               // 1 if odd pax (solo or odd group), else 0
+    var rooms   = doubles + singles;     // total room count
 
     /* Region day-rates: local transport + activities, PER PERSON per day */
     var perDay = [0, 0];
@@ -152,8 +154,9 @@
     perDay = scaleR(perDay, 1 / nRegions);
     var regionDays = scaleR(perDay, Math.max(days, 1) * pax);
 
-    /* Hotels: ROOM_BASED — ceil(pax/2) rooms × nights */
-    var hotels = scaleR(COST.hotelNightUSD[style], rooms * nights);
+    /* Hotels: doubles at base rate; single room carries 27% premium over half a double */
+    var roomMultiplier = doubles + singles * 1.27;
+    var hotels = scaleR(COST.hotelNightUSD[style], roomMultiplier * nights);
 
     /* Experiences & entry permits: PER_PERSON */
     var experiences = scaleR([12, 45], nRegions * pax);
@@ -173,14 +176,17 @@
     /* Insurance: PER_PERSON per week */
     var insurance = scaleR(COST.insuranceWeekUSD, Math.max(days / 7, 0.5) * pax);
 
-    var roomNote = rooms > 1
-      ? rooms + " rooms (" + pax + " travellers, 2 per room)"
-      : nights + " night" + (nights === 1 ? "" : "s");
+    var roomConfig = pax === 1
+      ? "1 single room (solo premium)"
+      : (doubles > 0 ? doubles + " double" + (doubles > 1 ? "s" : "") : "") +
+        (doubles > 0 && singles > 0 ? " + " : "") +
+        (singles > 0 ? "1 single" : "") +
+        " · " + pax + " traveller" + (pax > 1 ? "s" : "");
+    var roomNote = roomConfig + " · " + nights + " night" + (nights === 1 ? "" : "s");
 
     var lines = [
       { key: "Local days (transport + activities)",                  range: regionDays },
-      { key: "Hotels · " + rooms + " room" + (rooms === 1 ? "" : "s") + " · " + nights + " night" + (nights === 1 ? "" : "s"),
-        subkey: roomNote, range: hotels },
+      { key: "Hotels · " + roomConfig, subkey: roomNote, range: hotels },
       { key: "Experiences & permits",                               range: experiences },
       { key: "Food · " + Math.max(days, 1) + " day" + (days === 1 ? "" : "s"), range: food },
       { key: "Intercity travel",                                    range: intercity },
@@ -554,8 +560,107 @@
 
     mainGrid.appendChild(rail);
     root.appendChild(mainGrid);
+
+    /* Smart travel tips */
+    var tipsSection = buildTravelTips(params, regions, cost);
+    if (tipsSection) root.appendChild(tipsSection);
+
     root.appendChild(buildShareBar());
     injectItineraryJsonLd(params, regions);
+  }
+
+  function buildTravelTips(params, regions, cost) {
+    var tips = [];
+    var regionIds = regions.map(function (r) { return r.id; });
+    var style   = params.style;
+    var pax     = params.pax || 1;
+    var month   = params.month || "";
+    var days    = params.days || 7;
+
+    /* Seasonal tips */
+    var hotMonths   = ["Apr","May","Jun","Jul","Aug","Sep"];
+    var cycloneRisk = ["May","Jun","Oct","Nov"];
+    var bestMonths  = ["Nov","Dec","Jan","Feb"];
+    if (hotMonths.indexOf(month) !== -1) {
+      tips.push({ icon: "☀", text: "You've picked a hot, humid month. Pack loose, light clothing and plan outdoor sightseeing before 10 am. Midday is best spent in AC cafes or museums." });
+    }
+    if (cycloneRisk.indexOf(month) !== -1) {
+      tips.push({ icon: "🌀", text: month + " sits in Bangladesh's cyclone window. Coastal areas (Cox's Bazar, Kuakata, Sundarbans) carry some weather risk — check the forecast before heading south." });
+    }
+    if (bestMonths.indexOf(month) !== -1) {
+      tips.push({ icon: "🌿", text: "You've picked peak season — clear skies, low humidity, and lush green countryside after the monsoon. Book accommodation ahead, especially for the Sundarbans." });
+    }
+
+    /* Region-specific tips */
+    if (regionIds.indexOf("sundarbans") !== -1) {
+      tips.push({ icon: "🐅", text: "For the Sundarbans, book a licensed eco-tour from Mongla or Khulna — they include the required forest permit. Budget 2 full nights minimum for a real tiger-territory feel." });
+    }
+    if (regionIds.indexOf("hilltracts") !== -1) {
+      tips.push({ icon: "🪪", text: "The Chittagong Hill Tracts require a special permit for foreign nationals. Apply in advance through your hotel or a local tour operator in Khagrachhari or Rangamati." });
+    }
+    if (regionIds.indexOf("mymensingh") !== -1) {
+      tips.push({ icon: "🚤", text: "For Tanguar Haor, rent a full overnight houseboat from Sunamganj town (book at least 2 days ahead in peak season). Dawn on the water is the highlight — don't rush the morning." });
+    }
+    if (regionIds.indexOf("coxsbazar") !== -1) {
+      tips.push({ icon: "🏝", text: "St Martin Island requires a boat from Teknaf — the last boat usually leaves early afternoon. Stay overnight for the sunrise crowd to thin out and the reef to come alive." });
+    }
+
+    /* Style tips */
+    if (style === "backpacker") {
+      tips.push({ icon: "🏨", text: "Budget guest houses are plentiful in Dhaka, Cox's Bazar and Sylhet. Outside tourist hubs, expect basic rooms — carry a padlock for lockers and a small torch for power-cut evenings." });
+    }
+    if (style === "premium") {
+      tips.push({ icon: "🍽", text: "Premium dining in Bangladesh is excellent value compared to South-East Asia. The best restaurants are in Dhaka's Gulshan/Banani — book in advance for rooftop tables on weekends." });
+    }
+
+    /* Pax tips */
+    if (pax >= 3) {
+      tips.push({ icon: "🚌", text: "For groups of " + pax + ", hiring a private microbus (CNG or Hiace) for inter-city legs is often cheaper per head than individual seats — and much more flexible for stops." });
+    }
+
+    /* Duration tips */
+    if (days <= 5) {
+      tips.push({ icon: "⏱", text: "With " + days + " days, stick to one or two adjacent regions. Dhaka + Sundarbans, or Dhaka + Sylhet, are the two classic tight-schedule loops." });
+    }
+    if (days >= 10) {
+      tips.push({ icon: "🗺", text: "With " + days + " days you have space to slow down. Consider spending 2+ nights in each region rather than rushing — local transport and morning markets reward a slower pace." });
+    }
+
+    /* Universal tips (always useful, cap final count at 8) */
+    tips.push({ icon: "💵", text: "USD cash is easy to change at banks and exchange booths in Dhaka and main tourist towns. Bkash (mobile money) is widely accepted by local vendors — consider a local SIM with Bkash top-up for small payments." });
+    tips.push({ icon: "📶", text: "Grameenphone or Robi SIMs give the best data coverage outside Dhaka. An international eSIM (Airalo) works as backup but local SIMs are 5–10× cheaper for data in Bangladesh." });
+
+    if (!tips.length) return null;
+    tips = tips.slice(0, 8);
+
+    var section = el("section", "tips-card card");
+    var header = el("button", "tips-toggle", null);
+    header.type = "button";
+    header.setAttribute("aria-expanded", "false");
+    var titleSpan = el("span", null, "💡 Smart travel tips for your trip");
+    var chevron = el("span", "tips-chevron", "▾");
+    header.appendChild(titleSpan);
+    header.appendChild(chevron);
+    section.appendChild(header);
+
+    var body = el("div", "tips-body");
+    body.hidden = true;
+    var list2 = el("ul", "tips-list");
+    tips.forEach(function (t) {
+      var li = el("li", "tips-item");
+      li.innerHTML = '<span class="tips-icon" aria-hidden="true">' + t.icon + '</span><span class="tips-text">' + t.text + '</span>';
+      list2.appendChild(li);
+    });
+    body.appendChild(list2);
+    section.appendChild(body);
+
+    header.addEventListener("click", function () {
+      var open = body.hidden;
+      body.hidden = !open;
+      header.setAttribute("aria-expanded", open ? "true" : "false");
+      chevron.textContent = open ? "▴" : "▾";
+    });
+    return section;
   }
 
   function buildShareBar() {

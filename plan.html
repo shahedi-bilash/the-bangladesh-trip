@@ -39,6 +39,39 @@
   <main id="main" class="section">
     <div class="wrap">
 
+      <!-- Pre-built plans -->
+      <section class="quick-plans" aria-label="Pre-built trip ideas">
+        <p class="eyebrow center">Start with a template</p>
+        <h2 class="center" style="margin-bottom:1.5rem">Popular itineraries</h2>
+        <div class="quick-plans-grid">
+          <a class="qp-card" href="plan.html?regions=dhaka-gateway,north-bengal&days=5&style=comfort&month=Dec&cur=USD&pax=2">
+            <span class="qp-days">5 days</span>
+            <strong class="qp-title">North Bengal heritage loop</strong>
+            <span class="qp-tags"><span>Paharpur UNESCO</span><span>Mahasthan</span><span>Puthia temples</span></span>
+            <span class="qp-go">Load this plan →</span>
+          </a>
+          <a class="qp-card" href="plan.html?regions=dhaka-gateway,mymensingh&days=4&style=comfort&month=Dec&cur=USD&pax=2">
+            <span class="qp-days">4 days</span>
+            <strong class="qp-title">Haor &amp; wetlands</strong>
+            <span class="qp-tags"><span>Tanguar Haor houseboat</span><span>Birishiri cliffs</span><span>Migratory birds</span></span>
+            <span class="qp-go">Load this plan →</span>
+          </a>
+          <a class="qp-card" href="plan.html?regions=dhaka-gateway,kuakata,bagerhat&days=6&style=comfort&month=Jan&cur=USD&pax=2">
+            <span class="qp-days">6 days</span>
+            <strong class="qp-title">Coastal south</strong>
+            <span class="qp-tags"><span>Kuakata double sunrise</span><span>Bagerhat mosque city</span><span>Sundarbans edge</span></span>
+            <span class="qp-go">Load this plan →</span>
+          </a>
+          <a class="qp-card" href="plan.html?regions=dhaka-gateway,comilla,north-bengal&days=7&style=comfort&month=Nov&cur=USD&pax=2">
+            <span class="qp-days">7 days</span>
+            <strong class="qp-title">Ancient Bangladesh</strong>
+            <span class="qp-tags"><span>Shalban Vihara ruins</span><span>Paharpur UNESCO</span><span>Mahasthan fort</span></span>
+            <span class="qp-go">Load this plan →</span>
+          </a>
+        </div>
+        <p class="qp-note center">Or fill in the form below to build your own.</p>
+      </section>
+
       <!-- The form (hidden once a full plan is in the URL) -->
       <div class="planner-form-wrap">
         <p class="eyebrow center">Trip planner</p>
@@ -88,6 +121,10 @@
               <div class="choice">
                 <input type="checkbox" name="regions" id="r-comilla" value="comilla">
                 <label for="r-comilla"><span class="c-title">Comilla–Mainamati</span><span class="c-sub">Buddhist ruins · 1+ days</span></label>
+              </div>
+              <div class="choice">
+                <input type="checkbox" name="regions" id="r-mymensingh" value="mymensingh">
+                <label for="r-mymensingh"><span class="c-title">Mymensingh & Haors</span><span class="c-sub">Wetlands · houseboat · 2+ days</span></label>
               </div>
             </div>
           </div>
@@ -189,9 +226,9 @@
         </div>
       </div>
       <p class="footer-disclosure">Some links on this site are affiliate links. We may earn a commission from bookings made through them, at no extra cost to you. Cost estimates are indicative and visa rules must always be verified with an official source.</p>
-      <p class="footer-contact"><a href="https://www.facebook.com/shahedi.bilash" target="_blank" rel="noopener">Contact the author →</a></p>
+      
       <div class="footer-bottom">
-        <span>© <span id="year"></span> The Bangladesh Trip by Shahedi Bilash. An independent project.</span>
+        <span>© <span id="year"></span> The Bangladesh Trip by <a href="mailto:shahedibilash2@gmail.com" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,.35)">Shahedi Bilash</a>. An independent project.</span>
         <span>Made for travellers, not for a board.</span>
       </div>
     </div>

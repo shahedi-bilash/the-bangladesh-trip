@@ -14,7 +14,8 @@ var REGION_LABELS = {
   "north-bengal":  "North Bengal (Paharpur)",
   "kuakata":       "Kuakata",
   "bagerhat":      "Bagerhat",
-  "comilla":       "Comilla–Mainamati"
+  "comilla":       "Comilla–Mainamati",
+  "mymensingh":    "Mymensingh & Haor Wetlands"
 };
 
 /* Slugs used in plan.html?regions= */
@@ -27,7 +28,8 @@ var REGION_PLAN_SLUG = {
   "north-bengal":  "northbengal",
   "kuakata":       "kuakata",
   "bagerhat":      "bagerhat",
-  "comilla":       "comilla"
+  "comilla":       "comilla",
+  "mymensingh":    "mymensingh"
 };
 
 /* Hotel cost ranges: [min, max] USD per person per night */
@@ -44,7 +46,9 @@ var SPOT_HOTEL_COSTS = {
   "Bogura":       { budget: [8,  15], comfort: [28,  55] },
   "Kuakata":      { budget: [10, 18], comfort: [30,  60] },
   "Bagerhat":     { budget: [8,  15], comfort: [25,  50] },
-  "Comilla":      { budget: [8,  14], comfort: [25,  50] }
+  "Comilla":      { budget: [8,  14], comfort: [25,  50] },
+  "Mymensingh":   { budget: [8,  14], comfort: [25,  52] },
+  "Sunamganj":    { budget: [7,  13], comfort: [20,  42] }
 };
 
 /* Inter-region transfers: cost[0]=budget, cost[1]=comfort USD/person one-way */
@@ -68,7 +72,11 @@ var INTER_REGION_COSTS = {
   "bagerhat:kuakata":          { label: "Bagerhat/Khulna → Kuakata (bus)",              cost: [8,  20] },
   "comilla:coxs-bazar":        { label: "Comilla → Cox's Bazar (bus)",                  cost: [8,  22] },
   "comilla:hill-tracts":       { label: "Comilla → Chittagong (bus)",                   cost: [5,  14] },
-  "north-bengal:comilla":      { label: "Rajshahi → Comilla (train/bus)",               cost: [12, 28] }
+  "north-bengal:comilla":      { label: "Rajshahi → Comilla (train/bus)",               cost: [12, 28] },
+  "dhaka-gateway:mymensingh":  { label: "Dhaka → Mymensingh (train or bus)",             cost: [2,   6] },
+  "mymensingh:sylhet":         { label: "Mymensingh → Sylhet (bus)",                     cost: [5,  14] },
+  "dhaka-gateway:sylhet":      { label: "Dhaka → Sylhet (overnight train or bus)",       cost: [4,  15] },
+  "comilla:mymensingh":        { label: "Comilla → Mymensingh (bus via Dhaka)",          cost: [6,  16] }
 };
 
 /* ---- SPOT DATA -------------------------------------------------------
@@ -581,6 +589,65 @@ var SPOTS = {
       aff:      null,
       desc:     "A large medieval lake dug in 1458 by Raja Dharma Manikya. At dawn, fishermen cast hand nets from dugout canoes while egrets stalk the shallows.",
       tags:     ["nature", "photography", "history"]
+    }
+  ],
+
+  /* ── MYMENSINGH & HAOR WETLANDS ───────────────────────────────────── */
+  "mymensingh": [
+    {
+      id:       "tanguar-haor",
+      name:     "Tanguar Haor — the open water",
+      photo:    "/assets/img/mymensingh-haor.webp",
+      duration: 2,
+      base:     "Sunamganj",
+      transfer: { cost: [5, 14], note: "Boat from Sunamganj town" },
+      aff:      { label: "Book a houseboat tour (Klook)", url: "https://klook.tpm.li/KKQ1Iup8" },
+      desc:     "A Ramsar-listed wetland of 100+ inter-connected haors, swollen to a vast inland sea November–April. Overnight houseboats give you dawn on open water surrounded by tens of thousands of migratory waterfowl.",
+      tags:     ["nature", "birds", "boat", "photography"]
+    },
+    {
+      id:       "birishiri-cliffs",
+      name:     "Birishiri — white clay cliffs",
+      photo:    "/assets/img/mymensingh-birishiri.webp",
+      duration: 1,
+      base:     "Mymensingh",
+      transfer: { cost: [2, 6], note: "Bus from Mymensingh to Netrokona then CNG" },
+      aff:      null,
+      desc:     "Dramatic white china clay cliffs above the shallow, crystal Someshwari River — a surreal landscape you wade across. Popular with local travellers, barely known internationally.",
+      tags:     ["nature", "scenery", "photography"]
+    },
+    {
+      id:       "mymensingh-riverside",
+      name:     "Mymensingh riverside & Shashi Lodge",
+      photo:    "/assets/img/mymensingh-town.webp",
+      duration: 0.5,
+      base:     "Mymensingh",
+      transfer: { cost: [0, 2], note: "City centre" },
+      aff:      null,
+      desc:     "The old Brahmaputra riverfront, the 1905 Shashi Lodge Zamindar palace (now a government building), and the verdant campus of Bangladesh Agricultural University — a gentler side of urban Bangladesh.",
+      tags:     ["history", "architecture", "riverside"]
+    },
+    {
+      id:       "hakaluki-haor",
+      name:     "Hakaluki Haor birdwatching",
+      photo:    "/assets/img/mymensingh-hakaluki.webp",
+      duration: 1,
+      base:     "Sylhet",
+      transfer: { cost: [4, 10], note: "Bus from Sylhet or Moulvibazar" },
+      aff:      null,
+      desc:     "Bangladesh's largest single haor — over 90 species of migratory waterfowl winter here, including bar-headed geese, ferruginous ducks and painted storks. Best before 8 am from the embankment.",
+      tags:     ["birds", "nature", "wetlands"]
+    },
+    {
+      id:       "someshwari-river",
+      name:     "Someshwari River — Netrokona",
+      photo:    "/assets/img/mymensingh-someshwari.webp",
+      duration: 0.5,
+      base:     "Mymensingh",
+      transfer: { cost: [2, 6], note: "Bus from Mymensingh to Netrokona" },
+      aff:      null,
+      desc:     "A shallow, fast-flowing river that emerges from the Meghalaya hills — clear enough to see the riverbed, flanked by tea-coloured sand and the green Garo Hills on the horizon.",
+      tags:     ["nature", "scenic", "swimming"]
     }
   ]
 

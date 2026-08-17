@@ -247,6 +247,30 @@ const REGIONS = [
     imageCredit: "TODO(owner): add — suggest Sixty Dome Mosque (Wikimedia CC BY-SA)"
   },
   {
+    id: "mymensingh",
+    name: "Mymensingh & Haor Wetlands",
+    slug: "mymensingh-haor",
+    tagline: "Bangladesh's great open water — a flooded plain where migratory birds outnumber people in winter.",
+    bestMonths: ["Nov", "Dec", "Jan", "Feb"],
+    gettingThere: "Mymensingh is 2–3 hrs from Dhaka by train or bus. Tanguar Haor (Sunamganj) is 5–6 hrs from Dhaka via Sylhet or Kishoreganj — a boat from Sunamganj town covers the last leg.",
+    minDays: 2,
+    perDayUSD: { backpacker: [11, 22], comfort: [30, 62], premium: [75, 160] },
+    experiences: [
+      { title: "Tanguar Haor by houseboat", note: "A wetland the size of a small sea — 100+ haors linked at flood level. Overnight houseboats let you wake up surrounded by water. Migratory birds November–February.", affiliate: "klook" },
+      { title: "Birishiri and the Someshwari River", note: "The white clay cliffs of Birishiri (Netrokona) above a shallow, tea-coloured river you wade across. The most photogenic landscape most travellers have never heard of.", affiliate: "" },
+      { title: "Mymensingh riverside and Zamindar palace", note: "The old riverside town, Shashi Lodge palace, and the agricultural university campus — a slower, greener Dhaka-escape day.", affiliate: "" },
+      { title: "Hakaluki Haor birdwatching", note: "Bangladesh's largest haor — over 90 species of migratory waterfowl winter here. Best reached via Sylhet or Moulvibazar.", affiliate: "" }
+    ],
+    dayTemplates: [
+      { title: "Dhaka → Mymensingh riverside", detail: "Train or bus from Dhaka (2–3 hrs). Riverside walk, Shashi Lodge, and settle in." },
+      { title: "Birishiri day trip", detail: "Bus or CNG to Birishiri (Netrokona) — the white clay cliffs and Someshwari River crossing. Return to Mymensingh." },
+      { title: "Aboard the Tanguar Haor houseboat", detail: "Travel to Sunamganj and board the houseboat. The haor opens around you at dusk — sunset on open water." },
+      { title: "Haor at dawn — birds and boats", detail: "Up at first light for the spectacle of tens of thousands of migratory birds lifting from the water. Slow morning cruise, return." }
+    ],
+    image: "assets/img/mymensingh-haor.webp",
+    imageCredit: "TODO(owner): add — suggest Tanguar Haor (Wikimedia CC BY-SA)"
+  },
+  {
     id: "comilla",
     name: "Comilla & Mainamati",
     slug: "comilla-mainamati",

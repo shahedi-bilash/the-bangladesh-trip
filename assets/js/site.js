@@ -37,6 +37,7 @@
     "regions/kuakata":                  { region: "kuakata",     days: 3, season: "Nov–Mar", name: "Kuakata", exp: false },
     "regions/bagerhat":                 { region: "bagerhat",    days: 2, season: "Nov–Feb", name: "Bagerhat", exp: true },
     "regions/comilla-mainamati":        { region: "comilla",     days: 2, season: "Oct–Mar", name: "Comilla–Mainamati", exp: false },
+    "regions/mymensingh-haor":          { region: "mymensingh",  days: 4, season: "Nov–Feb", name: "Mymensingh & the Haors", exp: true },
     "sundarbans-tour-cost-from-dhaka":  { region: "dhaka,sundarbans", days: 5, season: "Nov–Feb", name: "a Sundarbans trip", exp: true },
     "7-day-bangladesh-itinerary-cost":  { region: "dhaka,sundarbans,sylhet", days: 7, season: "Nov–Feb", name: "this 7-day trip", exp: true },
     "bangladesh-trip-budget-2-weeks":   { region: "dhaka,sylhet,sundarbans,coxsbazar,hilltracts", days: 14, season: "Nov–Feb", name: "the full loop", exp: false },
