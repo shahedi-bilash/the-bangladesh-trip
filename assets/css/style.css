@@ -544,6 +544,30 @@ a:hover { text-decoration-color: currentColor; }
 .tips-icon { flex-shrink: 0; font-size: 1.15rem; line-height: 1.4; }
 .tips-text { font-size: .9rem; color: var(--ink-70); line-height: 1.5; }
 
+/* ---- Responsive safety net ---- */
+/* Clip SVG map label overflow on very small viewports */
+.map-wrap { overflow: hidden; }
+/* Ensure wide tables/code/frames never cause horizontal scroll */
+.wrap { overflow-x: clip; }
+.wrap table, .wrap pre, .wrap iframe { max-width: 100%; overflow-x: auto; }
+/* Planner form: ensure range slider doesn't burst container at 375px */
+@media (max-width: 420px) {
+  .range-row { flex-wrap: wrap; }
+  .planner-form { padding: 1rem; }
+  .cost-row { flex-wrap: wrap; gap: .2rem; }
+  .cost-val { margin-left: auto; }
+}
+/* Tips toggle button full-width on mobile */
+@media (max-width: 600px) {
+  .tips-toggle { font-size: .97rem; }
+  .quick-plans-grid { gap: .75rem; }
+  .qp-card { padding: .85rem .85rem .75rem; }
+}
+/* Ensure credits 3-col grid rows don't get too tall on narrow widths */
+@media (max-width: 399px) {
+  .credit-row { grid-template-columns: 1fr; }
+}
+
 /* Utility */
 [hidden] { display: none !important; }
 .center { text-align: center; }
@@ -742,14 +766,14 @@ a:hover { text-decoration-color: currentColor; }
 .beauty-card:hover img,
 .beauty-card:focus-within img { transform: scale(1.03); }
 
-/* Overlay — gradient band, slides UP from bottom only, max ~35% of card */
+/* Overlay — gradient band, slides UP from bottom only.
+   No max-height or overflow:hidden here — parent .beauty-card clips everything.
+   Padding-bottom: 12px ensures credit line is never cut off. */
 .beauty-cap {
   position: absolute;
   bottom: 0; left: 0; right: 0;
-  max-height: 38%;
-  overflow: hidden;
-  background: linear-gradient(to top, rgba(4,20,12,.93) 0%, rgba(4,20,12,.65) 55%, transparent 100%);
-  padding: 2.2rem 1rem .85rem;
+  background: linear-gradient(to top, rgba(4,20,12,.95) 0%, rgba(4,20,12,.72) 50%, transparent 100%);
+  padding: 2.6rem 1rem 12px;
   color: #fff;
   transform: translateY(100%);
   transition: transform .26s ease;
