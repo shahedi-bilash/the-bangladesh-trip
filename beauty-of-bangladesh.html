@@ -213,6 +213,60 @@
         </figcaption>
       </figure>
 
+      <figure class="beauty-card" role="listitem">
+        <img src="/assets/img/nb-somapura.webp" alt="The vast terracotta ruins of Somapura Mahavihara Buddhist monastery, Paharpur, North Bengal" loading="lazy" decoding="async" onerror="this.style.display='none'">
+        <figcaption class="beauty-cap">
+          <span class="beauty-loc">Paharpur, North Bengal</span>
+          <span class="beauty-desc">The largest Buddhist monastery in South Asia — 177 monks' cells surrounding a towering central stupa, 8th century Pala dynasty, flat plains stretching to the horizon.</span>
+          <span class="beauty-credit">Photo: <a href="https://commons.wikimedia.org/wiki/File:Paharpur_Buddhist_Bihar.jpg" target="_blank" rel="noopener">Wikimedia Commons</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a></span>
+        </figcaption>
+      </figure>
+
+      <figure class="beauty-card" role="listitem">
+        <img src="/assets/img/kuakata.webp" alt="Wide sandy beach at Kuakata, Bay of Bengal — the two-horizon shore" loading="lazy" decoding="async" onerror="this.style.display='none'">
+        <figcaption class="beauty-cap">
+          <span class="beauty-loc">Kuakata Beach, Bay of Bengal</span>
+          <span class="beauty-desc">The only beach in Bangladesh from which sunrise and sunset are both visible from the same shore — 18 km of sand curving into the Bay of Bengal.</span>
+          <span class="beauty-credit">Photo: <a href="https://en.wikipedia.org/wiki/Kuakata" target="_blank" rel="noopener">Wikimedia Commons</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a></span>
+        </figcaption>
+      </figure>
+
+      <figure class="beauty-card" role="listitem">
+        <img src="/assets/img/bagerhat-sixty.webp" alt="Exterior of the Sixty Dome Mosque, Bagerhat, Bangladesh — UNESCO World Heritage Site" loading="lazy" decoding="async" onerror="this.style.display='none'">
+        <figcaption class="beauty-cap">
+          <span class="beauty-loc">Sixty Dome Mosque, Bagerhat</span>
+          <span class="beauty-desc">Seventy-seven terracotta arches and sixty stone columns in a 15th-century mosque that is the finest surviving example of the Sultanate's architectural legacy. UNESCO World Heritage.</span>
+          <span class="beauty-credit">Photo: <a href="https://commons.wikimedia.org/wiki/File:Sixty_Dome_Mosque,Bagerhat.jpg" target="_blank" rel="noopener">Wikimedia Commons</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a></span>
+        </figcaption>
+      </figure>
+
+      <figure class="beauty-card" role="listitem">
+        <img src="/assets/img/comilla-shalban.webp" alt="Brick ruins of Shalban Vihara Buddhist monastery at Mainamati, Comilla, Bangladesh" loading="lazy" decoding="async" onerror="this.style.display='none'">
+        <figcaption class="beauty-cap">
+          <span class="beauty-loc">Shalban Vihara, Comilla</span>
+          <span class="beauty-desc">An 8th-century Buddhist monastery uncovered in the 1950s from the low hills of Mainamati — the same era as Paharpur, and almost completely unknown to visitors.</span>
+          <span class="beauty-credit">Photo: <a href="https://commons.wikimedia.org/wiki/File:Shalbon-vihara-04-by-Sakib-Ahmed-Nasim.jpg" target="_blank" rel="noopener">Sakib Ahmed Nasim</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a></span>
+        </figcaption>
+      </figure>
+
+      <figure class="beauty-card" role="listitem">
+        <img src="/assets/img/nb-mahasthan.webp" alt="Ancient earthen ramparts of Mahasthangarh, Bangladesh's oldest archaeological site" loading="lazy" decoding="async" onerror="this.style.display='none'">
+        <figcaption class="beauty-cap">
+          <span class="beauty-loc">Mahasthangarh, North Bengal</span>
+          <span class="beauty-desc">Bangladesh's oldest urban site — occupied continuously since the 3rd century BC. Earth ramparts still rise 4.5 metres above the Karatoa riverbank.</span>
+          <span class="beauty-credit">Photo: <a href="https://commons.wikimedia.org/wiki/File:BD_Mahasthangarh1_without_people.jpg" target="_blank" rel="noopener">Wikimedia Commons</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a></span>
+        </figcaption>
+      </figure>
+
+      <figure class="beauty-card" role="listitem">
+        <img src="/assets/img/bagerhat-ninedome.webp" alt="The Nine Dome Mosque in Bagerhat, Bangladesh — a smaller jewel of 15th-century Sultanate architecture" loading="lazy" decoding="async" onerror="this.style.display='none'">
+        <figcaption class="beauty-cap">
+          <span class="beauty-loc">Nine Dome Mosque, Bagerhat</span>
+          <span class="beauty-desc">Three rows of three terracotta domes, each subtly different, each a study in shadow at the right time of day. A five-minute walk from the Sixty Dome Mosque.</span>
+          <span class="beauty-credit">Photo: <a href="https://commons.wikimedia.org/wiki/File:Nine_Dome_Mosque,_Bagerhat.jpg" target="_blank" rel="noopener">Wikimedia Commons</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a></span>
+        </figcaption>
+      </figure>
+
     </div><!-- /.beauty-grid -->
 
     <!-- Photographer submission -->
@@ -263,6 +317,19 @@
 
   <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
   <script>(function(){var t=document.querySelector(".nav-toggle"),n=document.getElementById("nav");if(t&&n)t.addEventListener("click",function(){var o=n.classList.toggle("open");t.setAttribute("aria-expanded",o?"true":"false");});})();</script>
+  <script>
+    // Touch: tap a card to toggle its caption; tap outside to close
+    (function(){
+      if(!window.matchMedia('(hover:none)').matches) return;
+      document.getElementById('beautyGrid').addEventListener('click', function(e){
+        var card = e.target.closest('.beauty-card');
+        if(!card) { document.querySelectorAll('.beauty-card.cap-open').forEach(function(c){c.classList.remove('cap-open');}); return; }
+        var isOpen = card.classList.contains('cap-open');
+        document.querySelectorAll('.beauty-card.cap-open').forEach(function(c){c.classList.remove('cap-open');});
+        if(!isOpen) card.classList.add('cap-open');
+      });
+    })();
+  </script>
   <script src="assets/js/site.js" defer></script>
 </body>
 </html>
