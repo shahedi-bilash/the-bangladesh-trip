@@ -195,10 +195,25 @@
     }
   }
 
+  /* ---- Active nav link ---- */
+  function mountNavActive() {
+    var cur = location.pathname.replace(/\.html$/, '').replace(/\/+$/, '') || '/';
+    document.querySelectorAll('.nav a').forEach(function (a) {
+      if (a.classList.contains('nav-cta')) return;
+      var href = (a.getAttribute('href') || '').replace(/\.html$/, '').replace(/\/+$/, '');
+      if (!href) return;
+      var norm = href.startsWith('/') ? href : '/' + href;
+      if (cur === norm || cur.endsWith(norm) || cur.startsWith(norm + '/')) {
+        a.classList.add('nav-active');
+      }
+    });
+  }
+
   ready(function () {
     mountRail();
     mountStickyPlan();
     mountProgress();
     injectAffIcons();
+    mountNavActive();
   });
 })();
