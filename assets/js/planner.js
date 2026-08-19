@@ -15,6 +15,15 @@
   var STYLES = ["backpacker", "comfort", "premium"];
   var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
+  /* Region-planner slug → spot-planner region key (inverse of spots.js's
+     REGION_PLAN_SLUG). Used only to pre-filter spots.html's "Adjust spots →"
+     link when a plan covers exactly one region. */
+  var REGION_SPOT_SLUG = {
+    dhaka: "dhaka-gateway", sundarbans: "sundarbans", coxsbazar: "coxs-bazar",
+    sylhet: "sylhet", hilltracts: "hill-tracts", northbengal: "north-bengal",
+    kuakata: "kuakata", bagerhat: "bagerhat", comilla: "comilla", mymensingh: "mymensingh"
+  };
+
   /* ---------- small helpers ---------- */
   function $(sel, root) { return (root || document).querySelector(sel); }
   function $all(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
@@ -507,6 +516,21 @@
     var regionLink = el("a", "cta-sm", "🗺 Plan another region");
     regionLink.href = "plan.html";
     actCard.appendChild(regionLink);
+    /* Hand off to the spot-level planner. This skeleton is region+day level,
+       not built from named spots, so there is nothing to "carry over" beyond
+       scope (region, if the plan is single-region) and traveller/currency
+       context — spots.html has no concept of days/style/origin to receive. */
+    var adjustSpots = el("a", "cta-sm", "📍 Adjust spots →");
+    var spotsParams = new URLSearchParams();
+    if (regions.length === 1) {
+      var spotSlug = REGION_SPOT_SLUG[regions[0].id];
+      if (spotSlug) spotsParams.set("region", spotSlug);
+    }
+    if (pax > 1) spotsParams.set("pax", pax);
+    if (cur && cur !== "USD") spotsParams.set("cur", cur);
+    var spotsQs = spotsParams.toString();
+    adjustSpots.href = "spots.html" + (spotsQs ? "?" + spotsQs : "");
+    actCard.appendChild(adjustSpots);
     var copyBtn2 = el("button", "cta-sm", "🔗 Copy plan link");
     copyBtn2.type = "button";
     copyBtn2.addEventListener("click", function () {
