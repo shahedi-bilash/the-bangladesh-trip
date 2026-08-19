@@ -783,6 +783,13 @@
     if (form) form.closest(".planner-form-wrap").hidden = true;
     if (result) result.hidden = false;
   }
+  /* Scroll so the "Your Bangladesh plan" heading sits at the top of the
+     viewport — used after both a form submit and a pre-built template load. */
+  function scrollToResult() {
+    var target = $("#plan-result .result-head") || $("#plan-result");
+    if (!target) return;
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   function initPlanner() {
     var form = $("#planner-form");
@@ -857,20 +864,23 @@
         var np = getParams();
         showResult();
         renderResult(np);
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        scrollToResult();
       });
     }
 
     if (params.regions.length && params.days) {
       showResult();
       renderResult(params);
+      // Arrived with a ready plan (e.g. a "Load this plan →" template card,
+      // or a shared link) — scroll straight to the result too.
+      scrollToResult();
     } else {
       showForm();
     }
 
     window.addEventListener("popstate", function () {
       var p = getParams();
-      if (p.regions.length && p.days) { showResult(); renderResult(p); }
+      if (p.regions.length && p.days) { showResult(); renderResult(p); scrollToResult(); }
       else { showForm(); fillForm(p); }
     });
   }

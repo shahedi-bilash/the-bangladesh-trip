@@ -374,7 +374,10 @@ a:hover { text-decoration-color: currentColor; }
 .footer-brand .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--sand); display: inline-block; margin-left: 2px; }
 .footer-about { font-size: .92rem; opacity: .8; max-width: 40ch; }
 .footer-bottom { border-top: 1px solid rgba(247,243,234,.15); margin-top: 2rem; padding-top: 1.5rem; font-size: .82rem; opacity: .7; display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; justify-content: space-between; }
-.footer-bottom > span:first-child { white-space: nowrap; }
+/* First span wraps like a normal sentence — the &nbsp; in its markup (between
+   the mailto link and "An independent project.") stops the orphan line break;
+   we don't force the whole line rigid or mobile would overflow horizontally. */
+.footer-bottom > span:first-child { min-width: 0; }
 .footer-disclosure { font-size: .8rem; opacity: .65; margin-top: .8rem; max-width: 60ch; }
 .footer-contact { font-size: .8rem; text-align: center; margin-top: .75rem; }
 .footer-contact a { color: var(--cream); opacity: .5; text-decoration: none; transition: opacity .15s ease; display: inline; }
@@ -529,7 +532,12 @@ a:hover { text-decoration-color: currentColor; }
 .credit-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 1.5rem 0 2rem; }
 @media (max-width: 899px) { .credit-list { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 559px) { .credit-list { grid-template-columns: 1fr; } }
-.credit-row { display: flex; flex-direction: row; align-items: flex-start; gap: 12px; background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 12px; box-shadow: none; transition: box-shadow .18s ease, transform .18s ease; }
+/* min-width: 0 is the actual fix for the 3rd-column clipping bug: as a grid
+   item, .credit-row's default min-width is content-based, and the nowrap
+   .credit-place text was forcing its 1fr track wider than the grid container
+   — overflowing past .wrap's right edge and getting cut by overflow-x:clip.
+   min-width:0 lets the grid track (and the ellipsis inside) actually shrink. */
+.credit-row { display: flex; flex-direction: row; align-items: flex-start; gap: 12px; min-width: 0; background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 12px; box-shadow: none; transition: box-shadow .18s ease, transform .18s ease; }
 .credit-row:hover { box-shadow: 0 4px 18px rgba(18,33,27,.10); transform: translateY(-1px); }
 .credit-thumb { flex-shrink: 0; position: relative; width: 80px; height: 80px; border-radius: 6px; overflow: hidden; background: linear-gradient(135deg, #d5e3d8, #ecdfc4); }
 .credit-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
