@@ -639,7 +639,12 @@ a:hover { text-decoration-color: currentColor; }
 .sp-aff { font-size: .8rem; padding: .4rem .9rem; margin-top: 0; }
 
 /* ── Plan panel ─────────────────────────────────────────────────────── */
-.sp-panel { position: sticky; top: 112px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); max-height: calc(100vh - 130px); overflow-y: auto; }
+/* overflow lives on .sp-plan (the inner scroll region), not .sp-panel itself —
+   .sp-panel stays overflow:visible so hover box-shadows/transforms on its
+   children (buttons, rows near the top edge) are never clipped by the
+   panel's own rounded-corner box. */
+.sp-panel { position: sticky; top: 112px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); overflow: visible; }
+.sp-plan { display: block; max-height: calc(100vh - 130px); overflow-y: auto; overflow-x: visible; border-radius: 0 0 var(--radius) var(--radius); }
 .sp-panel-empty { padding: 2.5rem 1.25rem; text-align: center; color: var(--ink-70); }
 .sp-panel-empty-icon { font-size: 2.2rem; margin-bottom: .65rem; }
 .sp-panel-empty-title { font-family: var(--serif); font-size: 1.1rem; color: var(--ink); margin: 0 0 .3rem; }
@@ -700,7 +705,8 @@ a:hover { text-decoration-color: currentColor; }
 /* Responsive */
 @media (max-width: 960px) {
   .sp-layout { grid-template-columns: 1fr; }
-  .sp-panel { position: static; max-height: none; }
+  .sp-panel { position: static; }
+  .sp-plan { max-height: none; overflow-y: visible; }
   .sp-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
 }
 @media (max-width: 560px) {
