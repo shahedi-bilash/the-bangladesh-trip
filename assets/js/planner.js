@@ -842,6 +842,25 @@
         daysInput.addEventListener("input", function () { daysOut.textContent = daysInput.value + " days"; });
       }
 
+      /* Clear each field's inline warning as soon as it's satisfied, so the
+         user isn't stuck looking at a stale error after fixing it. */
+      $all("input[name='regions']", form).forEach(function (cb) {
+        cb.addEventListener("change", function () {
+          if ($all("input[name='regions']:checked", form).length) setFieldWarn("form-warn", false);
+        });
+      });
+      if (daysInput) {
+        daysInput.addEventListener("input", function () {
+          if (parseInt(daysInput.value, 10) >= 2) setFieldWarn("warn-days", false);
+        });
+      }
+      var fromInputEl = $("#f-from", form);
+      if (fromInputEl) {
+        fromInputEl.addEventListener("input", function () {
+          if (fromInputEl.value.trim()) setFieldWarn("warn-from", false);
+        });
+      }
+
       /* Pax stepper */
       var paxIn = $("#f-pax", form);
       var paxCount = $("#pax-count");
@@ -874,13 +893,33 @@
         });
       }
 
-      /* Form submission */
+      /* Form submission — 3 required fields: regions, days, from.
+         Hide/show each field's own inline warning; focus the first invalid
+         field so the message is where the user is actually looking. */
+      function setFieldWarn(id, show) {
+        var warn = $("#" + id);
+        if (warn) warn.hidden = !show;
+        return warn;
+      }
       form.addEventListener("submit", function (e) {
         e.preventDefault();
         var state = readForm();
-        if (!state.regions.length) {
-          var warn = $("#form-warn");
-          if (warn) { warn.hidden = false; warn.focus && warn.focus(); }
+        var firstInvalid = null;
+
+        var regionsOk = state.regions.length > 0;
+        setFieldWarn("form-warn", !regionsOk);
+        if (!regionsOk && !firstInvalid) firstInvalid = $("#form-warn");
+
+        var daysOk = !!state.days && state.days >= 2;
+        setFieldWarn("warn-days", !daysOk);
+        if (!daysOk && !firstInvalid) firstInvalid = $("#f-days");
+
+        var fromOk = state.from.length > 0;
+        setFieldWarn("warn-from", !fromOk);
+        if (!fromOk && !firstInvalid) firstInvalid = $("#f-from");
+
+        if (!regionsOk || !daysOk || !fromOk) {
+          if (firstInvalid && firstInvalid.focus) firstInvalid.focus();
           return;
         }
         var qs = buildQuery(state);

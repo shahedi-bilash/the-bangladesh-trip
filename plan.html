@@ -44,25 +44,25 @@
         <p class="eyebrow center">Start with a template</p>
         <h2 class="center" style="margin-bottom:1.5rem">Popular itineraries</h2>
         <div class="quick-plans-grid">
-          <a class="qp-card" href="plan.html?regions=dhaka-gateway,north-bengal&days=5&style=comfort&month=Dec&cur=USD&pax=2">
+          <a class="qp-card" href="plan.html?regions=dhaka,northbengal&days=5&style=comfort&month=Dec&cur=USD&pax=2">
             <span class="qp-days">5 days</span>
             <strong class="qp-title">North Bengal heritage loop</strong>
             <span class="qp-tags"><span>Paharpur UNESCO</span><span>Mahasthan</span><span>Puthia temples</span></span>
             <span class="qp-go">Load this plan →</span>
           </a>
-          <a class="qp-card" href="plan.html?regions=dhaka-gateway,mymensingh&days=4&style=comfort&month=Dec&cur=USD&pax=2">
+          <a class="qp-card" href="plan.html?regions=dhaka,mymensingh&days=4&style=comfort&month=Dec&cur=USD&pax=2">
             <span class="qp-days">4 days</span>
             <strong class="qp-title">Haor &amp; wetlands</strong>
             <span class="qp-tags"><span>Tanguar Haor houseboat</span><span>Birishiri cliffs</span><span>Migratory birds</span></span>
             <span class="qp-go">Load this plan →</span>
           </a>
-          <a class="qp-card" href="plan.html?regions=dhaka-gateway,kuakata,bagerhat&days=6&style=comfort&month=Jan&cur=USD&pax=2">
+          <a class="qp-card" href="plan.html?regions=dhaka,kuakata,bagerhat&days=6&style=comfort&month=Jan&cur=USD&pax=2">
             <span class="qp-days">6 days</span>
             <strong class="qp-title">Coastal south</strong>
             <span class="qp-tags"><span>Kuakata double sunrise</span><span>Bagerhat mosque city</span><span>Sundarbans edge</span></span>
             <span class="qp-go">Load this plan →</span>
           </a>
-          <a class="qp-card" href="plan.html?regions=dhaka-gateway,comilla,north-bengal&days=7&style=comfort&month=Nov&cur=USD&pax=2">
+          <a class="qp-card" href="plan.html?regions=dhaka,comilla,northbengal&days=7&style=comfort&month=Nov&cur=USD&pax=2">
             <span class="qp-days">7 days</span>
             <strong class="qp-title">Ancient Bangladesh</strong>
             <span class="qp-tags"><span>Shalban Vihara ruins</span><span>Paharpur UNESCO</span><span>Mahasthan fort</span></span>
@@ -79,13 +79,13 @@
         <p class="lead center" style="margin:0 auto 2rem">A few taps and you'll have a cost range, a day-by-day skeleton and your visa route.</p>
 
         <form class="planner-form" id="planner-form">
-          <p class="form-warn" id="form-warn" tabindex="-1" hidden>Please choose at least one region to plan around.</p>
 
           <!-- Regions -->
           <div class="field">
-            <span class="field-label" id="lbl-regions">Where would you go?</span>
+            <span class="field-label" id="lbl-regions">Where would you go? <span class="req-mark" aria-hidden="true">*</span></span>
             <p class="field-help">Pick one or more. The planner sizes your days across whatever you choose.</p>
-            <div class="choice-grid" role="group" aria-labelledby="lbl-regions">
+            <p class="form-warn form-warn-field" id="form-warn" tabindex="-1" hidden>Please choose at least one region to plan around.</p>
+            <div class="choice-grid" role="group" aria-labelledby="lbl-regions" aria-describedby="form-warn">
               <div class="choice">
                 <input type="checkbox" name="regions" id="r-dhaka" value="dhaka">
                 <label for="r-dhaka"><span class="c-title">Dhaka Gateway</span><span class="c-sub">The capital · 2+ days</span></label>
@@ -131,12 +131,13 @@
 
           <!-- Days -->
           <div class="field">
-            <label class="field-label" for="f-days">How many days?</label>
+            <label class="field-label" for="f-days">How many days? <span class="req-mark" aria-hidden="true">*</span></label>
             <p class="field-help">Total days on the ground in Bangladesh.</p>
             <div class="range-row">
-              <input type="range" id="f-days" name="days" min="2" max="30" step="1" value="7">
+              <input type="range" id="f-days" name="days" min="2" max="30" step="1" value="7" required aria-required="true" aria-describedby="warn-days">
               <span class="range-out" id="f-days-out">7 days</span>
             </div>
+            <p class="form-warn form-warn-field" id="warn-days" tabindex="-1" hidden>Please set the number of days.</p>
           </div>
 
           <!-- Style -->
@@ -175,9 +176,10 @@
           <div class="field">
             <div class="two-col">
               <div>
-                <label class="field-label" for="f-from">Where are you flying from?</label>
+                <label class="field-label" for="f-from">Where are you flying from? <span class="req-mark" aria-hidden="true">*</span></label>
                 <p class="field-help">For your visa route & currency.</p>
-                <input class="input" list="country-list" id="f-from" name="from" placeholder="e.g. United Kingdom" autocomplete="country-name">
+                <input class="input" list="country-list" id="f-from" name="from" placeholder="e.g. United Kingdom" autocomplete="country-name" required aria-required="true" aria-describedby="warn-from">
+                <p class="form-warn form-warn-field" id="warn-from" tabindex="-1" hidden>Please tell us where you're flying from — it sets your visa route and currency.</p>
                 <datalist id="country-list"><!-- populated by planner.js from COUNTRIES --></datalist>
               </div>
               <div>
