@@ -809,18 +809,18 @@
   }
   /* Scroll so the "Your Bangladesh plan" heading sits at the top of the
      viewport — used after both a form submit and a pre-built template load.
-     Deferred two animation frames: called synchronously during initial page
-     load (template-card / shared-link arrival), a scroll fired before the
-     browser's own scroll-restoration-on-navigation finishes gets silently
-     overwritten back to 0. Waiting two rAFs puts us safely after that. */
+     Deferred via setTimeout: called synchronously during initial page load
+     (template-card / shared-link arrival), a scroll fired immediately gets
+     silently overwritten back to 0 by the browser's own scroll-restoration-
+     on-navigation, which runs after synchronous script execution. A short
+     timeout reliably lands after that (rAF also works for this, but can be
+     throttled/skipped in a backgrounded tab — setTimeout is the safer bet). */
   function scrollToResult() {
     var target = $("#plan-result .result-head") || $("#plan-result");
     if (!target) return;
-    requestAnimationFrame(function () {
-      requestAnimationFrame(function () {
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-    });
+    setTimeout(function () {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 60);
   }
 
   function initPlanner() {
