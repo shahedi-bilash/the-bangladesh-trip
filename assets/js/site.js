@@ -197,13 +197,25 @@
 
   /* ---- Active nav link ---- */
   function mountNavActive() {
-    var cur = location.pathname.replace(/\.html$/, '').replace(/\/+$/, '') || '/';
+    // Normalise via a real URL resolution (a.href, not getAttribute) so
+    // page-relative hrefs on nested pages (regions/*.html use "index.html",
+    // "../visa.html" etc.) resolve against *their* document, not the site
+    // root — string-matching the raw attribute breaks on every nested page.
+    // A trailing "/index" collapses to its parent, so the "Regions" link
+    // (→ regions/index.html) stays active on every regions/*.html subpage,
+    // not just the listing page itself.
+    function normPath(p) {
+      return (p.replace(/\.html$/, '').replace(/\/+$/, '').replace(/\/index$/, '')) || '/';
+    }
+    var cur = normPath(location.pathname);
     document.querySelectorAll('.nav a').forEach(function (a) {
       if (a.classList.contains('nav-cta')) return;
-      var href = (a.getAttribute('href') || '').replace(/\.html$/, '').replace(/\/+$/, '');
-      if (!href) return;
-      var norm = href.startsWith('/') ? href : '/' + href;
-      if (cur === norm || cur.endsWith(norm) || cur.startsWith(norm + '/')) {
+      var raw = a.getAttribute('href') || '';
+      if (!raw || raw.charAt(0) === '#') return;
+      var resolvedPath;
+      try { resolvedPath = new URL(a.href).pathname; } catch (e) { return; }
+      var norm = normPath(resolvedPath);
+      if (cur === norm || cur.startsWith(norm + '/')) {
         a.classList.add('nav-active');
       }
     });
