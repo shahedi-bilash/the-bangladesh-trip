@@ -808,11 +808,19 @@
     if (result) result.hidden = false;
   }
   /* Scroll so the "Your Bangladesh plan" heading sits at the top of the
-     viewport — used after both a form submit and a pre-built template load. */
+     viewport — used after both a form submit and a pre-built template load.
+     Deferred two animation frames: called synchronously during initial page
+     load (template-card / shared-link arrival), a scroll fired before the
+     browser's own scroll-restoration-on-navigation finishes gets silently
+     overwritten back to 0. Waiting two rAFs puts us safely after that. */
   function scrollToResult() {
     var target = $("#plan-result .result-head") || $("#plan-result");
     if (!target) return;
-    target.scrollIntoView({ behavior: "smooth", block: "start" });
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
   }
 
   function initPlanner() {
