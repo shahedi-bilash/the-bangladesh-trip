@@ -27,17 +27,21 @@
 
   /* ---- Sticky action-rail config, keyed by page ---- */
   // region: planner region id · days: prefill length · season: best months
+  // lat/lon: approximate coordinates of the region's main hub town/city —
+  // there's no real geo-data anywhere else in the codebase (the homepage
+  // map is a hand-illustrated SVG with arbitrary pixel positions, not
+  // geographic ones), so these are sourced fresh, only for the weather card.
   var RAIL = {
-    "regions/dhaka-gateway":            { region: "dhaka",      days: 3, season: "Nov–Feb", name: "Dhaka Gateway", exp: true },
-    "regions/sundarbans":               { region: "sundarbans", days: 5, season: "Nov–Feb", name: "the Sundarbans", exp: true },
-    "regions/coxs-bazar-saint-martin":  { region: "coxsbazar",  days: 4, season: "Nov–Mar", name: "Cox's Bazar", exp: true },
-    "regions/sylhet-srimangal":         { region: "sylhet",     days: 3, season: "Oct–Mar", name: "Sylhet & Srimangal", exp: true },
-    "regions/hill-tracts":              { region: "hilltracts", days: 4, season: "Nov–Feb", name: "the Hill Tracts", exp: true },
-    "regions/north-bengal":             { region: "northbengal", days: 3, season: "Nov–Feb", name: "North Bengal", exp: true },
-    "regions/kuakata":                  { region: "kuakata",     days: 3, season: "Nov–Mar", name: "Kuakata", exp: false },
-    "regions/bagerhat":                 { region: "bagerhat",    days: 2, season: "Nov–Feb", name: "Bagerhat", exp: true },
-    "regions/comilla-mainamati":        { region: "comilla",     days: 2, season: "Oct–Mar", name: "Comilla–Mainamati", exp: false },
-    "regions/mymensingh-haor":          { region: "mymensingh",  days: 4, season: "Nov–Feb", name: "Mymensingh & the Haors", exp: true },
+    "regions/dhaka-gateway":            { region: "dhaka",      days: 3, season: "Nov–Feb", name: "Dhaka Gateway", exp: true, lat: 23.8103, lon: 90.4125 },
+    "regions/sundarbans":               { region: "sundarbans", days: 5, season: "Nov–Feb", name: "the Sundarbans", exp: true, lat: 22.4869, lon: 89.6083 },
+    "regions/coxs-bazar-saint-martin":  { region: "coxsbazar",  days: 4, season: "Nov–Mar", name: "Cox's Bazar", exp: true, lat: 21.4272, lon: 92.0058 },
+    "regions/sylhet-srimangal":         { region: "sylhet",     days: 3, season: "Oct–Mar", name: "Sylhet & Srimangal", exp: true, lat: 24.8949, lon: 91.8687 },
+    "regions/hill-tracts":              { region: "hilltracts", days: 4, season: "Nov–Feb", name: "the Hill Tracts", exp: true, lat: 22.6533, lon: 92.1722 },
+    "regions/north-bengal":             { region: "northbengal", days: 3, season: "Nov–Feb", name: "North Bengal", exp: true, lat: 24.8465, lon: 89.3773 },
+    "regions/kuakata":                  { region: "kuakata",     days: 3, season: "Nov–Mar", name: "Kuakata", exp: false, lat: 21.8153, lon: 90.1197 },
+    "regions/bagerhat":                 { region: "bagerhat",    days: 2, season: "Nov–Feb", name: "Bagerhat", exp: true, lat: 22.6602, lon: 89.7895 },
+    "regions/comilla-mainamati":        { region: "comilla",     days: 2, season: "Oct–Mar", name: "Comilla–Mainamati", exp: false, lat: 23.4607, lon: 91.1809 },
+    "regions/mymensingh-haor":          { region: "mymensingh",  days: 4, season: "Nov–Feb", name: "Mymensingh & the Haors", exp: true, lat: 24.7471, lon: 90.4203 },
     "sundarbans-tour-cost-from-dhaka":  { region: "dhaka,sundarbans", days: 5, season: "Nov–Feb", name: "a Sundarbans trip", exp: true },
     "7-day-bangladesh-itinerary-cost":  { region: "dhaka,sundarbans,sylhet", days: 7, season: "Nov–Feb", name: "this 7-day trip", exp: true },
     "bangladesh-trip-budget-2-weeks":   { region: "dhaka,sylhet,sundarbans,coxsbazar,hilltracts", days: 14, season: "Nov–Feb", name: "the full loop", exp: false },
@@ -117,7 +121,105 @@
     wrap.classList.remove("article");
     wrap.classList.add("page-layout");
     wrap.appendChild(content);
-    wrap.appendChild(buildRail(cfg));
+    var rail = buildRail(cfg);
+    if (typeof cfg.lat === "number" && typeof cfg.lon === "number") {
+      mountWeather(cfg, rail);
+    }
+    wrap.appendChild(rail);
+  }
+
+  /* ---- Weather card (region pages only) ----
+     Open-Meteo: free, keyless, unlimited, no attribution required.
+     Cached per region in localStorage for 3h (weather goes stale faster
+     than exchange rates, but travellers don't need to-the-minute data).
+     If the fetch fails and there's no cache, the card is simply omitted —
+     never shows blank/broken data, just quietly isn't there. */
+  var WMO = {
+    0: ["☀️", "Clear"], 1: ["🌤️", "Mostly clear"], 2: ["⛅", "Partly cloudy"], 3: ["☁️", "Overcast"],
+    45: ["🌫️", "Fog"], 48: ["🌫️", "Fog"],
+    51: ["🌦️", "Light drizzle"], 53: ["🌦️", "Drizzle"], 55: ["🌦️", "Dense drizzle"],
+    56: ["🌦️", "Freezing drizzle"], 57: ["🌦️", "Freezing drizzle"],
+    61: ["🌧️", "Light rain"], 63: ["🌧️", "Rain"], 65: ["🌧️", "Heavy rain"],
+    66: ["🌧️", "Freezing rain"], 67: ["🌧️", "Freezing rain"],
+    71: ["🌨️", "Light snow"], 73: ["🌨️", "Snow"], 75: ["🌨️", "Heavy snow"], 77: ["🌨️", "Snow grains"],
+    80: ["🌦️", "Rain showers"], 81: ["🌦️", "Rain showers"], 82: ["⛈️", "Violent showers"],
+    85: ["🌨️", "Snow showers"], 86: ["🌨️", "Snow showers"],
+    95: ["⛈️", "Thunderstorm"], 96: ["⛈️", "Thunderstorm"], 99: ["⛈️", "Thunderstorm"]
+  };
+  function wmoInfo(code) { return WMO[code] || ["🌡️", ""]; }
+  var WX_DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  var WX_MAX_AGE_MS = 3 * 60 * 60 * 1000; // 3h
+
+  function wxCacheKey(cfg) { return "btrip_wx_" + cfg.region.replace(/[^a-z0-9]/gi, "_"); }
+
+  function readWxCache(cfg) {
+    try {
+      var raw = localStorage.getItem(wxCacheKey(cfg));
+      if (!raw) return null;
+      var obj = JSON.parse(raw);
+      if (!obj || !obj.data || !obj.fetchedAt) return null;
+      return obj;
+    } catch (e) { return null; }
+  }
+  function writeWxCache(cfg, data) {
+    try {
+      localStorage.setItem(wxCacheKey(cfg), JSON.stringify({ data: data, fetchedAt: Date.now() }));
+    } catch (e) { /* storage full/disabled — non-fatal */ }
+  }
+
+  function renderWeatherCard(card, data) {
+    card.innerHTML = "";
+    var cur = data.current;
+    var curInfo = wmoInfo(cur.weather_code);
+    var head = document.createElement("div");
+    head.className = "wx-now";
+    head.innerHTML = '<span class="wx-now-icon" aria-hidden="true">' + curInfo[0] + '</span>' +
+      '<span class="wx-now-temp">' + Math.round(cur.temperature_2m) + '°C</span>' +
+      '<span class="wx-now-label">' + curInfo[1] + '</span>';
+    card.appendChild(head);
+
+    var days = document.createElement("div");
+    days.className = "wx-days";
+    var time = data.daily.time, tmax = data.daily.temperature_2m_max, tmin = data.daily.temperature_2m_min, wcode = data.daily.weather_code;
+    for (var i = 0; i < time.length && i < 5; i++) {
+      var d = new Date(time[i] + "T00:00:00");
+      var info = wmoInfo(wcode[i]);
+      var cell = document.createElement("div");
+      cell.className = "wx-day";
+      cell.innerHTML = '<span class="wx-day-lbl">' + (i === 0 ? "Today" : WX_DAY_LABELS[d.getDay()]) + '</span>' +
+        '<span class="wx-day-icon" aria-hidden="true">' + info[0] + '</span>' +
+        '<span class="wx-day-temp">' + Math.round(tmax[i]) + '°/' + Math.round(tmin[i]) + '°</span>';
+      days.appendChild(cell);
+    }
+    card.appendChild(days);
+    card.hidden = false;
+  }
+
+  function mountWeather(cfg, rail) {
+    var card = document.createElement("div");
+    card.className = "rail-card wx-card";
+    card.hidden = true; // stays hidden until we actually have data to show
+    rail.appendChild(card);
+
+    var cached = readWxCache(cfg);
+    var isFresh = cached && (Date.now() - cached.fetchedAt) < WX_MAX_AGE_MS;
+    if (cached) renderWeatherCard(card, cached.data); // show stale data immediately rather than nothing
+    if (isFresh) return;
+
+    var url = "https://api.open-meteo.com/v1/forecast?latitude=" + cfg.lat + "&longitude=" + cfg.lon +
+      "&current=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=5";
+    fetch(url).then(function (res) {
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return res.json();
+    }).then(function (data) {
+      if (!data || !data.current || !data.daily) throw new Error("unexpected payload");
+      renderWeatherCard(card, data);
+      writeWxCache(cfg, data);
+    }).catch(function () {
+      // Fetch failed. If we had stale cache, it's already showing above —
+      // leave it. If there was no cache at all, the card stays hidden;
+      // never show a broken/empty weather card.
+    });
   }
 
   function mountStickyPlan() {
