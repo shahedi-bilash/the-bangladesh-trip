@@ -506,11 +506,17 @@ a:hover { text-decoration-color: currentColor; }
 @media (prefers-reduced-motion: reduce) { .sticky-plan { transition: opacity .2s ease; transform: none; } .sticky-plan.is-visible { transform: none; } }
 
 /* ---- Inner-page 2-column layout with a sticky action rail ---- */
-.page-layout { display: grid; grid-template-columns: minmax(0, 720px) 1fr; gap: clamp(1.5rem, 4vw, 3rem); align-items: start; }
-.page-layout > .article { max-width: 720px; margin: 0; }
-.page-rail { position: sticky; top: 88px; align-self: start; display: grid; gap: 1rem; }
+/* minmax(0, …) on every track, not bare 1fr: a bare 1fr track carries an
+   implicit minmax(auto, 1fr), so any descendant with non-shrinkable
+   content (e.g. nowrap text) forces the whole track — and everything
+   sharing it — wider than the viewport. This bit the mobile rail once
+   already (weather forecast cells); guarding both columns here instead
+   of patching each new content type as it's added. */
+.page-layout { display: grid; grid-template-columns: minmax(0, 720px) minmax(0, 1fr); gap: clamp(1.5rem, 4vw, 3rem); align-items: start; }
+.page-layout > .article { max-width: 720px; margin: 0; min-width: 0; }
+.page-rail { position: sticky; top: 88px; align-self: start; display: grid; gap: 1rem; min-width: 0; }
 @media (max-width: 900px) {
-  .page-layout { grid-template-columns: 1fr; }
+  .page-layout { grid-template-columns: minmax(0, 1fr); }
   .page-rail { position: static; margin-top: 2rem; }
 }
 .rail-card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.25rem; box-shadow: var(--shadow); }
