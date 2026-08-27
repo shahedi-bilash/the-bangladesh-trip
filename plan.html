@@ -195,6 +195,13 @@
             </div>
           </div>
 
+          <!-- Exact start date (optional, only used to check for BD public holidays during the trip) -->
+          <div class="field">
+            <label class="field-label" for="f-start">Exact start date <span style="font-weight:400;color:var(--ink-70)">(optional)</span></label>
+            <p class="field-help">If you know it, we'll flag any Bangladesh public holidays during your trip.</p>
+            <input class="input" type="date" id="f-start" name="start">
+          </div>
+
           <div class="form-submit">
             <button class="cta cta-lg" type="submit">Build my plan →</button>
           </div>
@@ -238,6 +245,7 @@
 
   <script src="assets/js/data.js"></script>
   <script src="assets/js/currency.js"></script>
+  <script src="assets/js/holidays.js"></script>
   <script src="assets/js/planner.js"></script>
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();

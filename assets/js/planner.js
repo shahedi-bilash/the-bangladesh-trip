@@ -51,6 +51,8 @@
     pax = clamp(pax, 1, 12);
     var cur = (p.get("cur") || "USD").toUpperCase();
     if (!FX[cur]) cur = "USD";
+    var start = p.get("start") || "";
+    if (start && !/^\d{4}-\d{2}-\d{2}$/.test(start)) start = ""; // malformed — ignore rather than break the holiday check
     return {
       regions: regions,
       days: days,
@@ -58,6 +60,7 @@
       pax: pax,
       from: p.get("from") || "",
       month: p.get("month") || "",
+      start: start,
       cur: cur
     };
   }
@@ -90,6 +93,15 @@
   }
   function addR(a, b) { return [a[0] + b[0], a[1] + b[1]]; }
   function scaleR(a, k) { return [a[0] * k, a[1] * k]; }
+
+  /* "YYYY-MM-DD" + n days -> "YYYY-MM-DD", via UTC so there's no
+     local-timezone/DST off-by-one. */
+  function addDaysISO(iso, n) {
+    var parts = iso.split("-").map(Number);
+    var d = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
+    d.setUTCDate(d.getUTCDate() + n);
+    return d.toISOString().slice(0, 10);
+  }
 
   /* ---------- country helpers ---------- */
   function findCountry(country) {
@@ -351,6 +363,40 @@
       (params.from ? " · from " + params.from : "") +
       (params.month ? " · " + params.month : "")));
     root.appendChild(head);
+
+    /* Public holiday check — only possible when an exact start date was
+       given (the month-only field isn't precise enough to anchor this).
+       Nager.Date lookup is async; the note stays hidden until/unless it
+       resolves with an actual overlap, so a slow or failed lookup never
+       shows a blank or broken box. */
+    if (params.start && params.days && typeof window.getHolidaysInRange === "function") {
+      var endDate = addDaysISO(params.start, params.days - 1);
+      var holidayBox = el("div", "callout holiday-note");
+      holidayBox.hidden = true;
+      root.appendChild(holidayBox);
+      window.getHolidaysInRange(params.start, endDate).then(function (holidays) {
+        if (!holidays.length) return;
+        holidayBox.innerHTML = "";
+        var title = el("p", null, null);
+        title.style.margin = "0 0 .4rem";
+        title.innerHTML = "<strong>🎉 Heads up:</strong> " +
+          (holidays.length === 1 ? "a public holiday falls" : holidays.length + " public holidays fall") +
+          " during your trip:";
+        holidayBox.appendChild(title);
+        var list = document.createElement("ul");
+        list.style.margin = "0";
+        list.style.paddingLeft = "1.2rem";
+        holidays.forEach(function (h) {
+          var d = new Date(h.date + "T00:00:00Z");
+          var dateLabel = d.toLocaleDateString("en-US", { month: "long", day: "numeric", timeZone: "UTC" });
+          var li = document.createElement("li");
+          li.innerHTML = "<strong>" + h.name + "</strong> falls on " + dateLabel + " — some government offices and monuments may have reduced hours.";
+          list.appendChild(li);
+        });
+        holidayBox.appendChild(list);
+        holidayBox.hidden = false;
+      });
+    }
 
     /* Cost card */
     var cost = computeCost(params);
@@ -752,6 +798,8 @@
     if (from && params.from) from.value = params.from;
     var month = $("#f-month", form);
     if (month && params.month) month.value = params.month;
+    var start = $("#f-start", form);
+    if (start && params.start) start.value = params.start;
     /* Pax stepper */
     var paxIn = $("#f-pax", form);
     var paxCount = $("#pax-count");
@@ -768,9 +816,10 @@
     var days = parseInt($("#f-days", form).value, 10) || 7;
     var from = ($("#f-from", form).value || "").trim();
     var month = ($("#f-month", form).value || "").trim();
+    var start = (($("#f-start", form) || {}).value || "").trim();
     var pax = parseInt(($("#f-pax", form) || {}).value, 10) || 1;
     pax = clamp(pax, 1, 12);
-    return { regions: regions, style: style, days: days, from: from, month: month, pax: pax };
+    return { regions: regions, style: style, days: days, from: from, month: month, start: start, pax: pax };
   }
 
   function buildQuery(state) {
@@ -781,6 +830,7 @@
     if (state.pax && state.pax > 1) p.set("pax", state.pax);
     if (state.from) p.set("from", state.from);
     if (state.month) p.set("month", state.month);
+    if (state.start) p.set("start", state.start);
     /* Currency: if user manually picked one, keep it;
        otherwise auto-derive from country */
     var cur;
