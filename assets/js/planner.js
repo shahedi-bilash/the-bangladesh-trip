@@ -956,9 +956,22 @@
     });
   }
 
+  /* Wait for currency.js's rate table (cached-fresh resolves almost
+     instantly; a live fetch or fallback resolves shortly after) so the
+     very first cost render uses the best rates available rather than
+     racing the fetch. CURRENCY_READY never rejects, but the plain
+     initPlanner() fallback covers the case where currency.js didn't load
+     at all (e.g. blocked by an ad/script blocker). */
+  function boot() {
+    if (window.CURRENCY_READY && typeof window.CURRENCY_READY.then === "function") {
+      window.CURRENCY_READY.then(initPlanner, initPlanner);
+    } else {
+      initPlanner();
+    }
+  }
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initPlanner);
+    document.addEventListener("DOMContentLoaded", boot);
   } else {
-    initPlanner();
+    boot();
   }
 })();

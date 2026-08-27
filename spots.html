@@ -118,6 +118,7 @@
   <script>(function(){var t=document.querySelector(".nav-toggle"),n=document.getElementById("nav");if(t&&n)t.addEventListener("click",function(){var o=n.classList.toggle("open");t.setAttribute("aria-expanded",o?"true":"false");});})();</script>
 
   <script src="assets/js/data.js"></script>
+  <script src="assets/js/currency.js"></script>
   <script src="assets/js/spots.js"></script>
   <script>
   /* ======================================================================
@@ -550,7 +551,14 @@
     renderGrid();
     if (activeFilter !== "all") applyFilter(activeFilter);
     updatePaxDisplay();
-    renderPanel();
+    /* Wait for currency.js's rate table before the first cost render —
+       cached-fresh resolves almost instantly; a live fetch or fallback
+       resolves shortly after. Never blocks the spot grid itself. */
+    if (window.CURRENCY_READY && typeof window.CURRENCY_READY.then === "function") {
+      window.CURRENCY_READY.then(renderPanel, renderPanel);
+    } else {
+      renderPanel();
+    }
 
   })();
   </script>
