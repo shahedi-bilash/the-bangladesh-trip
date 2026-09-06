@@ -246,6 +246,10 @@
   <script src="assets/js/data.js"></script>
   <script src="assets/js/currency.js"></script>
   <script src="assets/js/holidays.js"></script>
+  <!-- Spot-level data (SPOTS, REGION_PLAN_SLUG) — reused here for the inline
+       "select spots for this region" picker in the region-selection step,
+       so it never duplicates the spot list already used by spots.html. -->
+  <script src="assets/js/spots.js"></script>
   <script src="assets/js/planner.js"></script>
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();

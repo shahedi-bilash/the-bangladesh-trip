@@ -24,6 +24,49 @@
     kuakata: "kuakata", bagerhat: "bagerhat", comilla: "comilla", mymensingh: "mymensingh"
   };
 
+  /* Manual per-region spot picks made in the region-selection step's inline
+     picker. { regionId: [spotId, spotId, ...] }, in the order the user
+     checked them (that order is the priority order buildManualDaysForRegion
+     uses when more spots are picked than fit). Populated from the URL's
+     `spots` param on load (see decodeManualSpots) and mutated live by the
+     picker's checkboxes — buildItinerary() reads it directly. An empty/
+     missing entry for a region means "no manual pick — auto-recommend",
+     the exact pre-existing behaviour. */
+  var manualSpotSelections = {};
+  // Set by mountSpotPickers() once the picker UI exists; re-syncs every
+  // picker's checkboxes/labels from the current manualSpotSelections —
+  // called after popstate, where getParams() changes that state without
+  // otherwise touching this UI.
+  var spotPickersSync = null;
+
+  /* URL encoding for manualSpotSelections: "region:id,id;region:id,id".
+     Chosen for readability when debugging a shared link, and because ':'
+     ',' ';' all survive URLSearchParams round-tripping fine (it percent-
+     encodes them like any other value and decodes transparently). Unknown
+     region ids or spot ids (e.g. a hand-edited or stale link) are simply
+     dropped rather than erroring — same "missing param = no manual picks"
+     fallback as an absent `spots` param entirely. */
+  function encodeManualSpots(sel) {
+    var parts = [];
+    Object.keys(sel).forEach(function (regionId) {
+      var ids = sel[regionId];
+      if (ids && ids.length) parts.push(regionId + ":" + ids.join(","));
+    });
+    return parts.join(";");
+  }
+  function decodeManualSpots(str) {
+    var out = {};
+    if (!str) return out;
+    str.split(";").forEach(function (part) {
+      var i = part.indexOf(":");
+      if (i === -1) return;
+      var regionId = part.slice(0, i).trim();
+      var ids = part.slice(i + 1).split(",").map(function (s) { return s.trim(); }).filter(Boolean);
+      if (regionId && ids.length) out[regionId] = ids;
+    });
+    return out;
+  }
+
   /* ---------- small helpers ---------- */
   function $(sel, root) { return (root || document).querySelector(sel); }
   function $all(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
@@ -53,6 +96,12 @@
     if (!FX[cur]) cur = "USD";
     var start = p.get("start") || "";
     if (start && !/^\d{4}-\d{2}-\d{2}$/.test(start)) start = ""; // malformed — ignore rather than break the holiday check
+    // Re-sync manual spot picks from the URL every time params are read
+    // (initial load, popstate, or right after our own pushState on submit)
+    // so a missing/absent `spots` param — every pre-existing link — decodes
+    // to {} exactly like it always has, and a shared link with picks
+    // restores them.
+    manualSpotSelections = decodeManualSpots(p.get("spots") || "");
     return {
       regions: regions,
       days: days,
@@ -220,12 +269,13 @@
     return { lines: lines, total: total, perPerson: perPerson, nights: nights, rooms: rooms, pax: pax };
   }
 
-  /* ---------- day-by-day skeleton ---------- */
-  function buildItinerary(params) {
-    var regions = params.regions.map(regionById).filter(Boolean);
-    var days = params.days;
+  /* Weight-proportional day split across selected regions (region.minDays
+     as the weight), with a rounding-remainder pass so the total always
+     matches `days` exactly. Pulled out of buildItinerary() so the live
+     spot-picker warning can use the identical, always-in-sync allocation
+     instead of a second guess at it. */
+  function allocateDaysPerRegion(regions, days) {
     if (!regions.length || !days) return [];
-
     var weights = regions.map(function (r) { return r.minDays; });
     var wSum = weights.reduce(function (a, b) { return a + b; }, 0);
     var alloc = regions.map(function (r, i) {
@@ -240,16 +290,93 @@
       idx++;
       if (idx > 500) break;
     }
+    return alloc;
+  }
+
+  /* ---------- spot-level packing (mirrors spots.html's buildPlan() slot
+     logic exactly, so a manual pick behaves consistently between the two
+     planners): spots of duration >= 1 get their own day; shorter spots
+     pack together until a day's worth (>=1) accumulates. ---------- */
+  function packSpotsIntoDaySlots(spotObjs) {
+    var slots = [], curSlot = [], curDur = 0;
+    spotObjs.forEach(function (sp) {
+      if (sp.duration >= 1 || curDur + sp.duration > 1) {
+        if (curSlot.length) { slots.push(curSlot); curSlot = []; curDur = 0; }
+        if (sp.duration >= 1) { slots.push([sp]); return; }
+      }
+      curSlot.push(sp); curDur += sp.duration;
+      if (curDur >= 1) { slots.push(curSlot); curSlot = []; curDur = 0; }
+    });
+    if (curSlot.length) slots.push(curSlot);
+    return slots;
+  }
+
+  /* All spots for a planner region id (e.g. "dhaka"), via REGION_SPOT_SLUG
+     (planner id -> spots.js key, e.g. "dhaka-gateway") + spots.js's own
+     SPOTS table. Never throws if spots.js didn't load for some reason —
+     just yields no manual-pick option. */
+  function getRegionSpotList(regionId) {
+    if (typeof SPOTS === "undefined") return [];
+    var spotsKey = REGION_SPOT_SLUG[regionId];
+    return (spotsKey && SPOTS[spotsKey]) || [];
+  }
+
+  /* Build exactly `dayCount` {title, detail} entries for a region that has
+     a manual spot selection. Chosen spots are packed into day-slots in the
+     order the user picked them (priority = selection order); slots beyond
+     dayCount are silently dropped (the "more spots than days fit" case);
+     if the manual picks run out before filling dayCount, the remaining
+     days fall back to that region's own generic dayTemplates, cycling —
+     identical to what auto-pick would already show for those days. */
+  function buildManualDaysForRegion(region, manualIds, dayCount) {
+    var allSpots = getRegionSpotList(region.id);
+    var chosen = manualIds
+      .map(function (id) { return allSpots.filter(function (s) { return s.id === id; })[0]; })
+      .filter(Boolean);
+    if (!chosen.length) return null;
+    var slots = packSpotsIntoDaySlots(chosen);
+    var out = [];
+    for (var i = 0; i < dayCount; i++) {
+      if (i < slots.length) {
+        var slotSpots = slots[i];
+        out.push({
+          title: slotSpots.map(function (s) { return s.name; }).join(" + "),
+          detail: slotSpots.map(function (s) { return s.desc; }).join(" ")
+        });
+      } else {
+        var tmpl = region.dayTemplates[i % region.dayTemplates.length];
+        out.push({ title: tmpl.title + (i >= region.dayTemplates.length ? " · more time" : ""), detail: tmpl.detail });
+      }
+    }
+    return out;
+  }
+
+  /* ---------- day-by-day skeleton ---------- */
+  function buildItinerary(params) {
+    var regions = params.regions.map(regionById).filter(Boolean);
+    var days = params.days;
+    if (!regions.length || !days) return [];
+
+    var alloc = allocateDaysPerRegion(regions, days);
 
     var plan = [];
     var dayNo = 1;
     regions.forEach(function (r, ri) {
       var n = alloc[ri];
+      var manualIds = manualSpotSelections[r.id];
+      var manualDays = (manualIds && manualIds.length) ? buildManualDaysForRegion(r, manualIds, n) : null;
       for (var d = 0; d < n; d++) {
-        var tmpl = r.dayTemplates[d % r.dayTemplates.length];
-        var title = tmpl.title;
-        if (d >= r.dayTemplates.length) title += " · more time";
-        plan.push({ day: dayNo++, region: r.name, title: title, detail: tmpl.detail });
+        var title, detail;
+        if (manualDays) {
+          title = manualDays[d].title;
+          detail = manualDays[d].detail;
+        } else {
+          var tmpl = r.dayTemplates[d % r.dayTemplates.length];
+          title = tmpl.title;
+          if (d >= r.dayTemplates.length) title += " · more time";
+          detail = tmpl.detail;
+        }
+        plan.push({ day: dayNo++, region: r.name, title: title, detail: detail });
       }
     });
 
@@ -492,7 +619,7 @@
     if (visaQuick) summaryCard.appendChild(el("span", "visa-badge visa-" + visaQuick.summary, visaLabel(visaQuick.summary)));
     var editLink = el("a", "text-link", "← Change these choices");
     editLink.href = "plan.html?" + new URLSearchParams(window.location.search).toString();
-    editLink.addEventListener("click", function (e) { e.preventDefault(); showForm(); fillForm(getParams()); window.scrollTo({ top: 0, behavior: "smooth" }); });
+    editLink.addEventListener("click", function (e) { e.preventDefault(); showForm(); fillForm(getParams()); if (spotPickersSync) spotPickersSync(); window.scrollTo({ top: 0, behavior: "smooth" }); });
     summaryCard.appendChild(editLink);
 
     /* Trip essentials */
@@ -557,7 +684,7 @@
     actCard.appendChild(el("p", "pac-label", "What next?"));
     var editBtn = el("button", "cta-sm", "✎ Adjust these choices");
     editBtn.type = "button";
-    editBtn.addEventListener("click", function () { showForm(); fillForm(getParams()); window.scrollTo({ top: 0, behavior: "smooth" }); });
+    editBtn.addEventListener("click", function () { showForm(); fillForm(getParams()); if (spotPickersSync) spotPickersSync(); window.scrollTo({ top: 0, behavior: "smooth" }); });
     actCard.appendChild(editBtn);
     var regionLink = el("a", "cta-sm", "🗺 Plan another region");
     regionLink.href = "plan.html";
@@ -823,6 +950,11 @@
   }
 
   function buildQuery(state) {
+    // Snapshot the LIVE manual-spot state before anything below can call
+    // getParams() (which re-decodes manualSpotSelections from the OLD URL
+    // as a side effect) — otherwise a submit right after editing a picker
+    // would silently discard whatever was just picked.
+    var spotsStr = encodeManualSpots(manualSpotSelections);
     var p = new URLSearchParams();
     if (state.regions.length) p.set("regions", state.regions.join(","));
     p.set("days", state.days);
@@ -831,6 +963,7 @@
     if (state.from) p.set("from", state.from);
     if (state.month) p.set("month", state.month);
     if (state.start) p.set("start", state.start);
+    if (spotsStr) p.set("spots", spotsStr);
     /* Currency: if user manually picked one, keep it;
        otherwise auto-derive from country */
     var cur;
@@ -873,6 +1006,192 @@
     }, 60);
   }
 
+  /* ---------- inline "select spots for this region" picker ----------
+     Lives entirely in the region-selection step. Not a modal, not a route
+     change: an accordion panel that appears as a full-width row right
+     under whichever tile's trigger was clicked, built once here and
+     toggled with plain `hidden`. Auto-pick (no manual selection) is
+     untouched — buildItinerary() only branches when
+     manualSpotSelections[regionId] is a non-empty array. */
+  function mountSpotPickers() {
+    var form = $("#planner-form");
+    if (!form || typeof SPOTS === "undefined") return;
+    var regionInputs = $all("input[name='regions']", form);
+    var daysInputEl = $("#f-days", form);
+    var pickers = {}; // regionId -> { trigger, panel, warn, spots }
+    var openRegionId = null;
+
+    function computeAvailableDaysForRegion(regionId) {
+      var checkedIds = $all("input[name='regions']:checked", form).map(function (cb) { return cb.value; });
+      if (checkedIds.indexOf(regionId) === -1) checkedIds.push(regionId);
+      var regions = checkedIds.map(regionById).filter(Boolean);
+      var daysVal = parseInt((daysInputEl || {}).value, 10) || 7;
+      var alloc = allocateDaysPerRegion(regions, daysVal);
+      var idx = -1;
+      for (var i = 0; i < regions.length; i++) { if (regions[i].id === regionId) { idx = i; break; } }
+      return idx === -1 ? 1 : alloc[idx];
+    }
+
+    function updateTriggerLabel(regionId) {
+      var p = pickers[regionId];
+      if (!p) return;
+      var ids = manualSpotSelections[regionId];
+      if (ids && ids.length) {
+        p.trigger.textContent = ids.length + " spot" + (ids.length === 1 ? "" : "s") + " selected · Edit";
+        p.trigger.classList.add("has-manual-spots");
+      } else {
+        p.trigger.textContent = "Select spots for this region →";
+        p.trigger.classList.remove("has-manual-spots");
+      }
+    }
+
+    /* Live overflow check — recomputed on every spot check/uncheck, and on
+       anything that could change the days available (the days slider, or
+       another region being added/removed) while a picker is open. Warns,
+       never blocks: "Done" always works regardless. */
+    function updatePickerWarning(regionId) {
+      var p = pickers[regionId];
+      if (!p) return;
+      var ids = manualSpotSelections[regionId] || [];
+      if (!ids.length) { p.warn.hidden = true; return; }
+      var chosen = ids.map(function (id) { return p.spots.filter(function (s) { return s.id === id; })[0]; }).filter(Boolean);
+      var needed = packSpotsIntoDaySlots(chosen).length;
+      var available = computeAvailableDaysForRegion(regionId);
+      if (needed > available) {
+        p.warn.textContent = ids.length + " spot" + (ids.length === 1 ? "" : "s") + " selected, ~" + needed +
+          " day" + (needed === 1 ? "" : "s") + " needed, but only " + available + " available — some won't fit.";
+        p.warn.hidden = false;
+      } else {
+        p.warn.hidden = true;
+      }
+    }
+
+    function recomputeOpenWarning() {
+      if (openRegionId) updatePickerWarning(openRegionId);
+    }
+
+    function closePanel(regionId) {
+      var p = pickers[regionId];
+      if (!p || p.panel.hidden) return;
+      p.panel.hidden = true;
+      if (openRegionId === regionId) openRegionId = null;
+    }
+
+    regionInputs.forEach(function (input) {
+      var regionId = input.value;
+      var region = regionById(regionId);
+      var choice = input.closest(".choice");
+      var spots = getRegionSpotList(regionId);
+      if (!region || !choice || !spots.length) return; // nothing to pick — no trigger for this region
+
+      /* Trigger: lives inside the tile, shown only while checked via CSS
+         (`.choice input:checked ~ .spot-picker-trigger`). The tile's own
+         checkbox uses an invisible position:absolute;inset:0 input to make
+         the whole tile clickable — position:relative + z-index on the
+         trigger lifts it above that overlay so it's actually clickable
+         (verified live, see summary). */
+      var trigger = document.createElement("button");
+      trigger.type = "button";
+      trigger.className = "spot-picker-trigger";
+      choice.appendChild(trigger);
+
+      /* Panel: a SIBLING of .choice, not nested inside it — entirely
+         outside the invisible checkbox's overlay, so it needs no z-index
+         workaround, and grid-column:1/-1 (in CSS) spans the full row so it
+         always reads as belonging to the tile right above it. */
+      var panel = document.createElement("div");
+      panel.className = "spot-picker-panel";
+      panel.hidden = true;
+
+      var warn = document.createElement("p");
+      warn.className = "spot-picker-warn";
+      warn.hidden = true;
+      panel.appendChild(warn);
+
+      var list = document.createElement("div");
+      list.className = "spot-picker-list";
+      var checkboxes = {};
+      spots.forEach(function (sp) {
+        var row = document.createElement("label");
+        row.className = "spot-picker-item";
+        var cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.value = sp.id;
+        checkboxes[sp.id] = cb;
+        var span = document.createElement("span");
+        span.textContent = sp.name;
+        row.appendChild(cb);
+        row.appendChild(span);
+        list.appendChild(row);
+
+        cb.addEventListener("change", function () {
+          var cur = manualSpotSelections[regionId] || [];
+          if (cb.checked) {
+            if (cur.indexOf(sp.id) === -1) cur = cur.concat([sp.id]);
+          } else {
+            cur = cur.filter(function (id) { return id !== sp.id; });
+          }
+          if (cur.length) manualSpotSelections[regionId] = cur;
+          else delete manualSpotSelections[regionId];
+          updateTriggerLabel(regionId);
+          updatePickerWarning(regionId);
+        });
+      });
+      panel.appendChild(list);
+
+      var doneBtn = document.createElement("button");
+      doneBtn.type = "button";
+      doneBtn.className = "cta-sm spot-picker-done";
+      doneBtn.textContent = "Done";
+      doneBtn.addEventListener("click", function () {
+        closePanel(regionId);
+        trigger.focus(); // "immediately return focus to the region grid"
+      });
+      panel.appendChild(doneBtn);
+
+      choice.insertAdjacentElement("afterend", panel);
+      pickers[regionId] = { trigger: trigger, panel: panel, warn: warn, spots: spots, checkboxes: checkboxes };
+
+      trigger.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation(); // never let this reach the tile's own checkbox
+        if (!panel.hidden) { closePanel(regionId); return; }
+        if (openRegionId && openRegionId !== regionId) closePanel(openRegionId);
+        panel.hidden = false;
+        openRegionId = regionId;
+        updatePickerWarning(regionId);
+      });
+
+      input.addEventListener("change", function () {
+        if (!input.checked) closePanel(regionId);
+        recomputeOpenWarning();
+      });
+
+      updateTriggerLabel(regionId);
+    });
+
+    if (daysInputEl) daysInputEl.addEventListener("input", recomputeOpenWarning);
+
+    /* Sync every picker's checkboxes + trigger label from the CURRENT
+       manualSpotSelections — used for the initial restore (from a shared
+       link's `spots` param) and again after a popstate, since back/forward
+       navigation re-decodes manualSpotSelections to a different value via
+       getParams() without otherwise touching this UI. Exposed on the
+       module scope so initPlanner()'s popstate handler can call it. */
+    spotPickersSync = function () {
+      Object.keys(pickers).forEach(function (regionId) {
+        var p = pickers[regionId];
+        var ids = manualSpotSelections[regionId] || [];
+        Object.keys(p.checkboxes).forEach(function (spotId) {
+          p.checkboxes[spotId].checked = ids.indexOf(spotId) !== -1;
+        });
+        updateTriggerLabel(regionId);
+        if (openRegionId === regionId) updatePickerWarning(regionId);
+      });
+    };
+    spotPickersSync();
+  }
+
   function initPlanner() {
     var form = $("#planner-form");
     var params = getParams();
@@ -892,6 +1211,7 @@
 
     if (form) {
       fillForm(params);
+      mountSpotPickers();
 
       /* Live day readout */
       var daysInput = $("#f-days", form);
@@ -1003,6 +1323,7 @@
       var p = getParams();
       if (p.regions.length && p.days) { showResult(); renderResult(p); scrollToResult(); }
       else { showForm(); fillForm(p); }
+      if (spotPickersSync) spotPickersSync();
     });
   }
 
