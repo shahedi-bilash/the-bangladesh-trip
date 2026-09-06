@@ -531,7 +531,7 @@ const VISA = [
    booking/agoda still need their IDs — set to "TODO" until live. ---- */
 const AFF = {
   booking:   "",      // Booking.com: tracking is in AFF_BASE CJ URL
-  agoda:     "TODO",  // Agoda affiliate ID — pending
+  agoda:     "",      // Agoda: tracking (cid=1972585) is baked into AFF_BASE below, same pattern as Booking
   flights:   "",      // Aviasales via Travelpayouts
   transfer:  "",      // Kiwitaxi via Travelpayouts
   klook:     "",      // Klook via Travelpayouts
@@ -545,7 +545,12 @@ const AFF = {
 /* ---- Where each affiliate slug points (used to build outbound links) ---- */
 const AFF_BASE = {
   booking:   "https://www.tkqlhce.com/click-101858699-17293139?url=https%3A%2F%2Fwww.booking.com%2Fcountry%2Fbd.html",
-  agoda:     "https://www.agoda.com/",
+  // cid=1972585 is our Agoda affiliate CID — required for commission tracking,
+  // do not remove. Kept in sync by hand with assets/js/agoda-links.js's
+  // AGODA_GENERIC_LINK (that file drives the per-region hotel buttons on
+  // spots.html and region pages; this one drives plan.html's single
+  // whole-plan "Trip essentials" button).
+  agoda:     "https://www.agoda.com/partners/partnersearch.aspx?pcs=1&cid=1972585",
   flights:   "https://aviasales.tpm.li/GsTszCxG",
   transfer:  "https://kiwitaxi.tpm.li/pROaHRyF",
   klook:     "https://klook.tpm.li/KKQ1Iup8",

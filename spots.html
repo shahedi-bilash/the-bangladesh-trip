@@ -119,6 +119,7 @@
 
   <script src="assets/js/data.js"></script>
   <script src="assets/js/currency.js"></script>
+  <script src="assets/js/agoda-links.js"></script>
   <script src="assets/js/spots.js"></script>
   <script>
   /* ======================================================================
@@ -466,10 +467,20 @@
         var row = el("div", "sp-hotel-row");
         var rooms = seg.rooms;
         var lbl = el("span", null, seg.base + " · " + rooms + " room" + (rooms === 1 ? "" : "s") + " · " + seg.nights + " night" + (seg.nights === 1 ? "" : "s"));
-        var bookA = el("a", "cta-aff sp-hotel-btn", "Find hotels");
+        var btns = el("div", "sp-hotel-btns");
+        var bookA = el("a", "cta-aff sp-hotel-btn", "Booking");
         bookA.href = "https://www.tkqlhce.com/click-101858699-17293139?url=https%3A%2F%2Fwww.booking.com%2Fcountry%2Fbd.html";
         bookA.target = "_blank"; bookA.rel = "sponsored noopener";
-        row.appendChild(lbl); row.appendChild(bookA);
+        btns.appendChild(bookA);
+        // Agoda — cid=1972585 is required for commission tracking, see agoda-links.js
+        var agodaSlug = (typeof REGION_PLAN_SLUG !== "undefined" && REGION_PLAN_SLUG[seg.region]) || null;
+        if (typeof getAgodaLink === "function") {
+          var agodaA = el("a", "cta-aff sp-hotel-btn sp-hotel-btn-agoda", "Agoda");
+          agodaA.href = getAgodaLink(agodaSlug);
+          agodaA.target = "_blank"; agodaA.rel = "sponsored noopener";
+          btns.appendChild(agodaA);
+        }
+        row.appendChild(lbl); row.appendChild(btns);
         hotelSec.appendChild(row);
       });
       planEl.appendChild(hotelSec);

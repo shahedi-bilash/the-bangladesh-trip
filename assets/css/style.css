@@ -730,8 +730,13 @@ a:hover { text-decoration-color: currentColor; }
 
 /* Hotels */
 .sp-hotel-section { padding: 0 0 .2rem; }
-.sp-hotel-row { display: flex; justify-content: space-between; align-items: center; font-size: .86rem; padding: .3rem 1.1rem; border-top: 1px solid var(--line); }
+.sp-hotel-row { display: flex; justify-content: space-between; align-items: center; gap: .5rem; font-size: .86rem; padding: .3rem 1.1rem; border-top: 1px solid var(--line); flex-wrap: wrap; }
+.sp-hotel-btns { display: flex; gap: .4rem; flex-shrink: 0; }
 .sp-hotel-btn { margin-top: 0; font-size: .78rem; padding: .3rem .7rem; }
+/* Agoda gets an outline treatment so two adjacent buttons read as distinct
+   options, not a duplicated CTA — Booking keeps the solid gold fill. */
+.sp-hotel-btn-agoda { background: transparent; color: var(--teal-600); border: 1.5px solid var(--teal); }
+.sp-hotel-btn-agoda:hover { background: rgba(14,90,80,.06); color: var(--teal-600); }
 
 /* Actions */
 .sp-plan-actions { display: flex; flex-direction: column; gap: .5rem; padding: .9rem 1.1rem 0; }

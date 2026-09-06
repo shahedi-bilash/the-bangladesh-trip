@@ -98,6 +98,14 @@
 
     // Affiliate "Book" buttons
     card.appendChild(affButton("Find hotels on Booking", "https://www.tkqlhce.com/click-101858699-17293139?url=https%3A%2F%2Fwww.booking.com%2Fcountry%2Fbd.html", "booking.com"));
+    // Agoda — alongside Booking, not replacing it. cid=1972585 is required
+    // for commission tracking; getAgodaLink() (assets/js/agoda-links.js)
+    // falls back to the generic CID-tagged link for multi-region/no-region
+    // pages, so this is always tracked even when cfg.region isn't a single
+    // known region id.
+    if (typeof getAgodaLink === "function") {
+      card.appendChild(affButton("Find hotels on Agoda", getAgodaLink(cfg.region), "agoda.com"));
+    }
     card.appendChild(affButton("Compare airlines (Aviasales)", "https://aviasales.tpm.li/GsTszCxG", "aviasales.com"));
     if (cfg.exp) card.appendChild(affButton("Book experiences", "https://www.getyourguide.com/?partner_id=PNM6R9P&utm_medium=online_publisher", "getyourguide.com"));
 
