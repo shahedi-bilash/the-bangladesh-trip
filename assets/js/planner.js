@@ -1112,17 +1112,39 @@
       list.className = "spot-picker-list";
       var checkboxes = {};
       spots.forEach(function (sp) {
-        var row = document.createElement("label");
-        row.className = "spot-picker-item";
+        /* Same input+label sibling pattern as the region .choice tiles
+           (input is absolutely positioned & invisible, label is the
+           visible styled tile, ":checked + label" drives the selected
+           look) — reusing that exact mechanism means full native
+           checkbox semantics (focusable, Space/Enter to toggle, checked
+           state announced to screen readers) with no extra ARIA needed. */
+        var wrap = document.createElement("div");
+        wrap.className = "spot-tile-wrap";
         var cb = document.createElement("input");
         cb.type = "checkbox";
         cb.value = sp.id;
+        var cbId = "spot-" + regionId + "-" + sp.id;
+        cb.id = cbId;
         checkboxes[sp.id] = cb;
-        var span = document.createElement("span");
-        span.textContent = sp.name;
-        row.appendChild(cb);
-        row.appendChild(span);
-        list.appendChild(row);
+        var tile = document.createElement("label");
+        tile.setAttribute("for", cbId);
+        tile.className = "spot-tile";
+        var img = document.createElement("img");
+        img.className = "spot-tile-thumb";
+        img.src = sp.photo;
+        img.alt = sp.name;
+        img.loading = "lazy";
+        img.width = 120;
+        img.height = 90;
+        img.onerror = function () { img.style.display = "none"; };
+        var nameSpan = document.createElement("span");
+        nameSpan.className = "spot-tile-name";
+        nameSpan.textContent = sp.name;
+        tile.appendChild(img);
+        tile.appendChild(nameSpan);
+        wrap.appendChild(cb);
+        wrap.appendChild(tile);
+        list.appendChild(wrap);
 
         cb.addEventListener("change", function () {
           var cur = manualSpotSelections[regionId] || [];
